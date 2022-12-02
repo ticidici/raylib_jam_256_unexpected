@@ -72,7 +72,19 @@ jobs:
         dir ${{ env.PROJECT_RELEASE_PATH }}
         7z a -tzip -r .\${{ env.PROJECT_RELEASE_PATH }}.zip .\${{ env.PROJECT_RELEASE_PATH }}\*
       shell: cmd
+       
+    - name: Upload Artifacts to Githug Pages
+      uses: actions/upload-artifact@v3
+      with:
+        name: github-pages
+        path: ${{ env.PROJECT_RELEASE_PATH }}
         
+    - name: Deploy to githug pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ env.PROJECT_RELEASE_PATH }}
+       
     # Issue: Double zip: https://github.com/actions/upload-artifact/issues/39
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
