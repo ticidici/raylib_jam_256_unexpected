@@ -116,7 +116,7 @@ int main(void)
 void UpdateDrawFrame(void)
 {
 
-	static init = false;
+	static bool init = false;
 	static Camera camera = { 0 };
 
 	static Model tower;
