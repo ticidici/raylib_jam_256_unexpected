@@ -14,10 +14,7 @@ FetchContent_MakeAvailable(raylib)
 
 # Our Project
 include_directories(${PROJECT_SOURCE_DIR}/src)
-file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/src/*.h"
-        "${PROJECT_SOURCE_DIR}/src/*.c"
-)
+file(GLOB_RECURSE all_SRCS CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.h ${PROJECT_SOURCE_DIR}/src/*.c)
 add_executable(${PROJECT_NAME} ${all_SRCS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)

@@ -1,4 +1,6 @@
 #include "game.h"
+#define FLECS_CUSTOM_BUILD  // Don't build all addons
+#define FLECS_SYSTEM        // Build FLECS_SYSTEM
 
 #if defined(PLATFORM_WEB)
 #define CUSTOM_MODAL_DIALOGS       // Force custom modal dialogs usage
