@@ -34,7 +34,7 @@ jobs:
         ls
       shell: bash
 
-    - name: Build Product
+    - name: Build Project
       run: |
         cd ${{ env.PROJECT_BUILD_PATH }}
         cmake .. -DCMAKE_BUILD_TYPE=Release

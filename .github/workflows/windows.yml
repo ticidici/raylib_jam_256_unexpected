@@ -33,7 +33,7 @@ jobs:
         dir
       shell: cmd
 
-    - name: Build Product
+    - name: Build Project
       run: |
         dir
         cmake -S ${{ env.PROJECT_NAME }} -B ${{ env.PROJECT_BUILD_PATH }} -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022"

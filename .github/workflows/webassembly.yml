@@ -24,19 +24,12 @@ jobs:
       uses: actions/checkout@master
       with:
         path: ${{ env.PROJECT_NAME }}
-      
-    - name: Checkout raylib repo
-      uses: actions/checkout@v3
-      with:
-        repository: raysan5/raylib
-        path: raylib
   
     - name: Setup emsdk
       uses: mymindstorm/setup-emsdk@v11
       with:
         version: 3.1.26
         actions-cache-folder: 'emsdk-cache'
-
     
     - name: Setup Environment
       run: | 
@@ -44,7 +37,7 @@ jobs:
         mkdir ${{ env.PROJECT_BUILD_PATH }}
         dir
    
-    - name: Build Product
+    - name: Build Project
       run: |
         cd ${{ env.PROJECT_BUILD_PATH }}
         emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-s USE_GLFW=3" -DCMAKE_EXECUTABLE_SUFFIX=".html"
