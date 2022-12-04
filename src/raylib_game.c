@@ -11,7 +11,11 @@
 *
 ********************************************************************************************/
 
+
 #include "raylib.h"
+#include "raymath.h"
+#define RLIGHTS_IMPLEMENTATION
+#include "rlights.h"
 
 #if defined(PLATFORM_WEB)
 #define CUSTOM_MODAL_DIALOGS            // Force custom modal dialogs usage
@@ -58,6 +62,7 @@ static unsigned int prevScreenScale = 1;
 static RenderTexture2D target = { 0 };  // Initialized at init
 
 // TODO: Define global variables here, recommended to make them static
+
 
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
@@ -122,21 +127,48 @@ void UpdateDrawFrame(void)
 	static Model tower;
 	static Texture2D texture;
 	static Vector3 towerPos = { 0.0f, 0.0f, 0.0f };                        // Set model position
+	static Shader shader;
+	static Shader bloomShader;
+	static Light lights[MAX_LIGHTS] = { 0 };
+
+	static Model cube;
+
 
 	if (!init) {
 		init = true;
-		camera.position = (Vector3){ 200.0f, 200.0f, 200.0f }; // Camera position
-		camera.target = (Vector3){ 0.0f, 8.0f, 0.0f };      // Camera looking at point
-		camera.up = (Vector3){ 0.0f, 1.6f, 0.0f };          // Camera up vector (rotation towards target)
+		camera.position = (Vector3){ 2.0f, 4.0f, 6.0f };    // Camera position
+		camera.target = (Vector3){ 0.0f, 0.5f, 0.0f };      // Camera looking at point
+		camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
 		camera.fovy = 45.0f;                                // Camera field-of-view Y
-		camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
+		camera.projection = CAMERA_PERSPECTIVE;
+		SetCameraMode(camera, CAMERA_FREE); // Set a free camera mode
+		bloomShader = LoadShader(0, "resources/shaders/bloom.fs");
+
+		shader = LoadShader("resources/shaders/lighting.vs", "resources/shaders/lighting.fs");
+		// Get some required shader locations
+		shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+		// NOTE: "matModel" location name is automatically assigned on shader loading, 
+		// no need to get the location again if using that uniform name
+		//shader.locs[SHADER_LOC_MATRIX_MODEL] = GetShaderLocation(shader, "matModel");
+
+		// Ambient light level (some basic lighting)
+		int ambientLoc = GetShaderLocation(shader, "ambient");
+		SetShaderValue(shader, ambientLoc, (float[4]) { 0.1f, 0.1f, 0.1f, 1.0f }, SHADER_UNIFORM_VEC4);
+
+		// Create lights
+		lights[0] = CreateLight(LIGHT_DIRECTIONAL, (Vector3) { -0,10, -0 }, Vector3Zero(), WHITE, shader);
+		lights[1] = CreateLight(LIGHT_POINT, (Vector3) { 2, 1, 2 }, Vector3Zero(), RED, shader);
+		lights[2] = CreateLight(LIGHT_POINT, (Vector3) { -2, 1, 2 }, Vector3Zero(), GREEN, shader);
+		lights[3] = CreateLight(LIGHT_POINT, (Vector3) { 2, 1, -2 }, Vector3Zero(), BLUE, shader);
+
 
 		tower = LoadModel("resources/turret.obj");
 		texture = LoadTexture("resources/turret_diffuse.png"); // Load model texture
 		tower.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;            // Set model diffuse texture
+		tower.materials[0].shader = shader;
 
-		BoundingBox towerBBox = GetMeshBoundingBox(tower.meshes[0]);    // Get m
-		SetCameraMode(camera, CAMERA_FREE); // Set a free camera mode
+		cube = LoadModelFromMesh(GenMeshCube(2.0f, 4.0f, 2.0f));
+		cube.materials[0].shader = shader;
 	}
 
 
@@ -160,6 +192,14 @@ void UpdateDrawFrame(void)
 
 	UpdateCamera(&camera);
 
+
+	// Update the shader with the camera view vector (points towards { 0.0f, 0.0f, 0.0f })
+	float cameraPos[3] = { camera.position.x, camera.position.y, camera.position.z };
+	SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
+
+	// Update light values (actually, only enable/disable them)
+	for (int i = 0; i < MAX_LIGHTS; i++) UpdateLightValues(shader, lights[i]);
+
 	// TODO: Update variables / Implement example logic at this point
 	//----------------------------------------------------------------------------------
 
@@ -168,13 +208,18 @@ void UpdateDrawFrame(void)
 	// Render all screen to texture (for scaling)
 	BeginTextureMode(target);
 	{
-
-		BeginMode3D(camera);
 		ClearBackground(RAYWHITE);
 
+		BeginMode3D(camera);
 
-		DrawModel(tower, towerPos, 10.0f, WHITE);
+		DrawModel(tower, towerPos, 0.2f, WHITE);
 		DrawGrid(10, 10.0f);
+
+		for (int i = 0; i < MAX_LIGHTS; i++)
+		{
+			if (lights[i].enabled) DrawSphereEx(lights[i].position, 0.2f, 8, 8, lights[i].color);
+			else DrawSphereWires(lights[i].position, 0.2f, 8, 8, ColorAlpha(lights[i].color, 0.3f));
+		}
 
 		EndMode3D();
 
@@ -186,10 +231,11 @@ void UpdateDrawFrame(void)
 	BeginDrawing();
 	{
 		ClearBackground(RAYWHITE);
-
+		BeginShaderMode(bloomShader);
 		// Draw render texture to screen scaled as required
 		DrawTexturePro(target.texture, (Rectangle) { 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle) { 0, 0, (float)target.texture.width* screenScale, (float)target.texture.height* screenScale }, (Vector2) { 0, 0 }, 0.0f, WHITE);
-
+		EndShaderMode();
+		DrawFPS(10, 10);
 	}
 	EndDrawing();
 	//----------------------------------------------------------------------------------  
