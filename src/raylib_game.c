@@ -57,12 +57,22 @@ static unsigned int prevScreenScale = 1;
 
 static RenderTexture2D target = { 0 };  // Initialized at init
 
+#define FORTRESS_SIZE 7			//have to be odd numbers
+#define BATTLEFIELD_SIZE 13		//have to be odd numbers
+#define BATTLEFIELD_RING_WIDTH (BATTLEFIELD_SIZE-FORTRESS_SIZE)/2
+#define MIDDLE_TILE_INDEX (BATTLEFIELD_SIZE-1)/2
+#define FORTRESS_FIRST_TILE_INDEX BATTLEFIELD_RING_WIDTH
+#define FORTRESS_LAST_TILE_INDEX BATTLEFIELD_SIZE-BATTLEFIELD_RING_WIDTH-1
+#define BATTLEFIELD_LAST_TILE_INDEX BATTLEFIELD_SIZE-1
+
 // TODO: Define global variables here, recommended to make them static
 
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
 static void UpdateDrawFrame(void);      // Update and Draw one frame
+void Deinitialize(void);
+void TurnCamera(bool right);
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -99,8 +109,7 @@ int main(void)
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
-	UnloadRenderTexture(target);
-
+	Deinitialize();
 	// TODO: Unload all loaded resources at this point
 
 	CloseWindow();        // Close window and OpenGL context
@@ -108,6 +117,38 @@ int main(void)
 
 	return 0;
 }
+
+
+static Model tower;
+
+static Model red1;
+static Model red2;
+static Model red3;
+static Model red4;
+
+static Model pig;
+static Model wolf;
+
+static Model grassTile;
+static Model grass2Tile;
+static Model lavaTile;
+static Model dirtBrownTile;
+static Model dirtGrayTile;
+
+static Texture2D backgroundTexture;
+static Texture2D towerTexture;
+
+static Camera camera = { 0 };
+
+static int cameraPositionIndex = 0;
+static Vector3 camIsometricPositions[4] = {
+	{ 150.0f, 150.0, 150.0f },
+	{ 150.0f, 150.0, -150.0f },
+	{ -150.0f, 150.0, -150.0f },
+	{ -150.0f, 150.0, 150.0f }
+};
+
+
 
 //--------------------------------------------------------------------------------------------
 // Module functions definition
@@ -117,26 +158,121 @@ void UpdateDrawFrame(void)
 {
 
 	static bool init = false;
-	static Camera camera = { 0 };
 
-	static Model tower;
-	static Texture2D texture;
-	static Vector3 towerPos = { 0.0f, 0.0f, 0.0f };                        // Set model position
+	static Vector3 YAW = { 0, 1.0f, 0 };
+
+	static struct Tile
+	{
+		Vector3 positions[4];
+		Model tileType;
+
+		//entity occupying?
+	};
+
+	//still unused
+	static struct Wolf
+	{
+		Vector3 position;
+		float rotation;//degrees of yaw
+		Vector3 scale;
+		float speed;
+
+		struct Tile* tileOccupied;
+		Model model;
+	};
+
+	static struct Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE];
+
+	static Vector3 towerPos = { 0.0f, 0.0f, 0.0f };                          
+
+	static Vector3 camZenitalPos = { 0.0f, 250.0, 0.0f };
+	static Vector3 camIsometricPos = { 150.0f, 150.0, 150.0f };
+	static Vector3 camPerspectivePos = { 100.0f, 250.0, 100.0f };
+	static float camPerspectiveFov = 60.0f;
+	static float camOrthographicFov = 275.0f;
+
+	static float pigScale = 0.25f;
+	static float wolfScale = 0.25f;
+	static Vector3 wolfScaleVec = { 0.25f, 0.25f , 0.25f };
+	static float normalScale = 10.0f;
 
 	if (!init) {
 		init = true;
-		camera.position = (Vector3){ 200.0f, 200.0f, 200.0f }; // Camera position
-		camera.target = (Vector3){ 0.0f, 8.0f, 0.0f };      // Camera looking at point
-		camera.up = (Vector3){ 0.0f, 1.6f, 0.0f };          // Camera up vector (rotation towards target)
-		camera.fovy = 45.0f;                                // Camera field-of-view Y
-		camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
+
+		//camera.position = camPerspectivePos; // Camera position
+		camera.position = camIsometricPositions[0]; // Camera position
+		camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
+		camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+		//camera.fovy = camPerspectiveFov;                                // Camera field-of-view Y
+		//camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
+		camera.fovy = camOrthographicFov;                                // Camera field-of-view Y
+		camera.projection = CAMERA_ORTHOGRAPHIC;             // Camera mode type
+		
+		red1 = LoadModel("resources/red1.gltf");
+		red2 = LoadModel("resources/red2.gltf");
+		red3 = LoadModel("resources/red3.gltf");
+		red4 = LoadModel("resources/red4.gltf");
+		pig = LoadModel("resources/pig.glb");
+		wolf = LoadModel("resources/wolf.glb");
+
+		grassTile = LoadModel("resources/grass_tile.gltf");
+		grass2Tile = LoadModel("resources/grass2_tile.gltf");
+		lavaTile = LoadModel("resources/lava_tile.gltf");
+		dirtGrayTile = LoadModel("resources/dirtgray_tile.gltf");
+		dirtBrownTile = LoadModel("resources/dirtbrown_tile.gltf");
+
+		backgroundTexture = LoadTexture("resources/background.png");
 
 		tower = LoadModel("resources/turret.obj");
-		texture = LoadTexture("resources/turret_diffuse.png"); // Load model texture
-		tower.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;            // Set model diffuse texture
+		towerTexture = LoadTexture("resources/turret_diffuse.png"); // Load model texture
+		tower.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = towerTexture;            // Set model diffuse texture
 
 		BoundingBox towerBBox = GetMeshBoundingBox(tower.meshes[0]);    // Get m
 		SetCameraMode(camera, CAMERA_FREE); // Set a free camera mode
+
+
+		for (int i = 0; i < BATTLEFIELD_SIZE; i++)
+		{
+			for (int j = 0; j < BATTLEFIELD_SIZE; j++)
+			{
+				for (int k = 0; k < 4; k++)//max height, 3 floors + something standing on top
+				{
+					battlefieldTiles[i][j].positions[k].x = (i - MIDDLE_TILE_INDEX) * 40;
+					battlefieldTiles[i][j].positions[k].z = (j - MIDDLE_TILE_INDEX) * 40;
+					battlefieldTiles[i][j].positions[k].y = k * 20;
+
+					if ((i >= FORTRESS_FIRST_TILE_INDEX && i <= FORTRESS_LAST_TILE_INDEX)
+						&& (j >= FORTRESS_FIRST_TILE_INDEX && j <= FORTRESS_LAST_TILE_INDEX))
+					{
+						int randomValue = GetRandomValue(0, 100);
+						if (randomValue < 35)
+						{
+							battlefieldTiles[i][j].tileType = lavaTile;
+						}
+						//else if (randomValue < 55)
+						//{
+						//	battlefieldTiles[i][j].tileType = grassTile;
+						//}
+						else
+						{
+							battlefieldTiles[i][j].tileType = grass2Tile;
+						}
+
+					}
+					else
+					{
+						if (GetRandomValue(0, 100) < 35)
+						{
+							battlefieldTiles[i][j].tileType = dirtGrayTile;
+						}
+						else
+						{
+							battlefieldTiles[i][j].tileType = dirtBrownTile;
+						}
+					}
+				}
+			}
+		}
 	}
 
 
@@ -158,7 +294,18 @@ void UpdateDrawFrame(void)
 		prevScreenScale = screenScale;
 	}
 
+	if (IsKeyPressed(KEY_Q))
+	{
+		TurnCamera(false);
+	}
+	else if (IsKeyPressed(KEY_E))
+	{
+		TurnCamera(true);
+	}
+
+	//unless we use CUSTOM_CAMERA UpdateCamera overrides our rotation in favor of mouse input
 	UpdateCamera(&camera);
+
 
 	// TODO: Update variables / Implement example logic at this point
 	//----------------------------------------------------------------------------------
@@ -166,19 +313,45 @@ void UpdateDrawFrame(void)
 	// Draw
 	//----------------------------------------------------------------------------------
 	// Render all screen to texture (for scaling)
+
 	BeginTextureMode(target);
 	{
 
 		BeginMode3D(camera);
-		ClearBackground(RAYWHITE);
+		ClearBackground(BLACK);
+		//DrawGrid(40.0f, 40.0f);
+		//DrawTexture(towerTexture, 0, 0, WHITE);
+
+		//corners
+		DrawModel(red1, battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].positions[0], normalScale, WHITE);
+		DrawModel(red2, battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].positions[0], normalScale, WHITE);
+		DrawModel(red3, battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].positions[0], normalScale, WHITE);
+		DrawModel(red4, battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].positions[0], normalScale, WHITE);
+
+		//center
+		DrawModel(red1, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[0], normalScale, WHITE);
+		DrawModel(red1, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[1], normalScale, WHITE);
+		DrawModel(red4, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[2], normalScale, WHITE);
+
+		DrawModel(pig, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[3], pigScale, WHITE);
+		DrawModelEx(wolf, battlefieldTiles[0][6].positions[0], YAW, 90, wolfScaleVec, WHITE);
+		DrawModelEx(wolf, battlefieldTiles[6][0].positions[0], YAW, 0, wolfScaleVec, WHITE);
+		
 
 
-		DrawModel(tower, towerPos, 10.0f, WHITE);
-		DrawGrid(10, 10.0f);
+		for (int i = 0; i < BATTLEFIELD_SIZE; i++)
+		{
+			for (int j = 0; j < BATTLEFIELD_SIZE; j++)
+			{
+				DrawModel(battlefieldTiles[i][j].tileType, battlefieldTiles[i][j].positions[0], normalScale, WHITE);
+			}
+		}
+
+		//DrawModel(tower, towerPos, 10.0f, WHITE);
 
 		EndMode3D();
 
-		DrawCircleLines(GetMouseX(), GetMouseY(), 10, MAROON);
+		DrawCircleLines(GetMouseX(), GetMouseY(), 5.0f, MAROON);
 
 	}
 	EndTextureMode();
@@ -189,8 +362,50 @@ void UpdateDrawFrame(void)
 
 		// Draw render texture to screen scaled as required
 		DrawTexturePro(target.texture, (Rectangle) { 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle) { 0, 0, (float)target.texture.width* screenScale, (float)target.texture.height* screenScale }, (Vector2) { 0, 0 }, 0.0f, WHITE);
-
 	}
 	EndDrawing();
 	//----------------------------------------------------------------------------------  
+}
+
+void TurnCamera(bool right)
+{
+	if (right)
+	{
+		cameraPositionIndex++;
+	}
+	else
+	{
+		cameraPositionIndex--;
+	}
+
+	if (cameraPositionIndex < 0) cameraPositionIndex = 3;
+	else if (cameraPositionIndex > 3) cameraPositionIndex = 0;
+
+	camera.position = camIsometricPositions[cameraPositionIndex];
+	camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
+	camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+}
+
+void Deinitialize(void)
+{
+	UnloadRenderTexture(target);
+
+	UnloadTexture(towerTexture);
+	UnloadTexture(backgroundTexture);
+
+	UnloadModel(tower);
+
+	UnloadModel(pig);
+	UnloadModel(wolf);
+
+	UnloadModel(red1);
+	UnloadModel(red2);
+	UnloadModel(red3);
+	UnloadModel(red4);
+
+	UnloadModel(grassTile);
+	UnloadModel(grass2Tile);
+	UnloadModel(lavaTile);
+	UnloadModel(dirtGrayTile);
+	UnloadModel(dirtBrownTile);
 }
