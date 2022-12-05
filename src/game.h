@@ -3,10 +3,16 @@
 
 #include "raylib.h"
 
+// Public
 void Init();
 
 void Release();
 
 void Update();
+
+// Private
+void TurnCamera(bool right);
+
+void SetView(bool aIsBattlefieldView);
 
 #endif
