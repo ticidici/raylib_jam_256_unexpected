@@ -73,6 +73,7 @@ static RenderTexture2D target = { 0 };  // Initialized at init
 static void UpdateDrawFrame(void);      // Update and Draw one frame
 void Deinitialize(void);
 void TurnCamera(bool right);
+void SetView(bool aIsBattlefieldView);
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -121,6 +122,8 @@ int main(void)
 
 static Model tower;
 
+static Model tileSelector;
+
 static Model red1;
 static Model red2;
 static Model red3;
@@ -142,12 +145,19 @@ static Camera camera = { 0 };
 
 static int cameraPositionIndex = 0;
 static Vector3 camIsometricPositions[4] = {
-	{ 150.0f, 150.0, 150.0f },
-	{ 150.0f, 150.0, -150.0f },
-	{ -150.0f, 150.0, -150.0f },
-	{ -150.0f, 150.0, 150.0f }
+	{ 250.0f, 250.0, 250.0f },
+	{ 250.0f, 250.0, -250.0f },
+	{ -250.0f, 250.0, -250.0f },
+	{ -250.0f, 250.0, 250.0f }
 };
+static Vector3 camZenitalPos = { 0.0f, 250.0, 0.0f };
+static float camIsometricFortressFov = 280.0f;
+static float camIsometricBattlefieldFov = 520.0f;
+static float camZenitalFortressFov = 280.0f;
+static float camZenitalBattlefieldFov = 520.0f;
 
+static bool isCamIsometric = true;
+static bool isBattlefieldView = false;
 
 
 //--------------------------------------------------------------------------------------------
@@ -185,11 +195,8 @@ void UpdateDrawFrame(void)
 
 	static Vector3 towerPos = { 0.0f, 0.0f, 0.0f };                          
 
-	static Vector3 camZenitalPos = { 0.0f, 250.0, 0.0f };
-	static Vector3 camIsometricPos = { 150.0f, 150.0, 150.0f };
 	static Vector3 camPerspectivePos = { 100.0f, 250.0, 100.0f };
 	static float camPerspectiveFov = 60.0f;
-	static float camOrthographicFov = 275.0f;
 
 	static float pigScale = 0.25f;
 	static float wolfScale = 0.25f;
@@ -199,21 +206,30 @@ void UpdateDrawFrame(void)
 	if (!init) {
 		init = true;
 
+		//-------- CAM SETTINGS ---------
 		//camera.position = camPerspectivePos; // Camera position
 		camera.position = camIsometricPositions[0]; // Camera position
+		//camera.position = camZenitalPos; // Camera position
+
 		camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
 		camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+
 		//camera.fovy = camPerspectiveFov;                                // Camera field-of-view Y
 		//camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
-		camera.fovy = camOrthographicFov;                                // Camera field-of-view Y
+
+		camera.fovy = camIsometricFortressFov;                                // Camera field-of-view Y
 		camera.projection = CAMERA_ORTHOGRAPHIC;             // Camera mode type
-		
+		//-------- /CAM SETTINGS ---------
+
+
 		red1 = LoadModel("resources/red1.gltf");
 		red2 = LoadModel("resources/red2.gltf");
 		red3 = LoadModel("resources/red3.gltf");
 		red4 = LoadModel("resources/red4.gltf");
 		pig = LoadModel("resources/pig.glb");
 		wolf = LoadModel("resources/wolf.glb");
+
+		tileSelector = LoadModel("resources/tile_selector.gltf");
 
 		grassTile = LoadModel("resources/grass_tile.gltf");
 		grass2Tile = LoadModel("resources/grass2_tile.gltf");
@@ -294,17 +310,55 @@ void UpdateDrawFrame(void)
 		prevScreenScale = screenScale;
 	}
 
-	if (IsKeyPressed(KEY_Q))
+	bool cameraAngleChanged = false;
+
+	if (IsKeyPressed(KEY_F))
+	{
+		isBattlefieldView = !isBattlefieldView;
+		SetView(isBattlefieldView);
+	}
+	else if (IsKeyPressed(KEY_Q) && isCamIsometric)
 	{
 		TurnCamera(false);
+		SetCameraMode(camera, CAMERA_CUSTOM);
+		cameraAngleChanged = true;
 	}
-	else if (IsKeyPressed(KEY_E))
+	else if (IsKeyPressed(KEY_E) && isCamIsometric)
 	{
 		TurnCamera(true);
+		SetCameraMode(camera, CAMERA_CUSTOM);
+		cameraAngleChanged = true;
+	}
+	else if (IsKeyPressed(KEY_C))
+	{
+		isCamIsometric = !isCamIsometric;
+		SetView(isBattlefieldView);
+
+		if (isCamIsometric)
+		{
+			camera.position = camIsometricPositions[cameraPositionIndex];
+		}
+		else
+		{
+			camera.position = camZenitalPos;
+		}
+
+		camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+
+		SetCameraMode(camera, CAMERA_FREE);
+		UpdateCamera(&camera);
+		cameraAngleChanged = true;
 	}
 
-	//unless we use CUSTOM_CAMERA UpdateCamera overrides our rotation in favor of mouse input
-	UpdateCamera(&camera);
+	if (!cameraAngleChanged)
+	{
+		//unless we use CUSTOM_CAMERA UpdateCamera overrides our rotation in favor of mouse input
+		if (isCamIsometric)
+		{
+			UpdateCamera(&camera);
+			SetCameraMode(camera, CAMERA_FREE);
+		}
+	}
 
 
 	// TODO: Update variables / Implement example logic at this point
@@ -332,6 +386,8 @@ void UpdateDrawFrame(void)
 		DrawModel(red1, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[0], normalScale, WHITE);
 		DrawModel(red1, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[1], normalScale, WHITE);
 		DrawModel(red4, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[2], normalScale, WHITE);
+
+		DrawModel(tileSelector, battlefieldTiles[9][9].positions[0], normalScale, WHITE);
 
 		DrawModel(pig, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[3], pigScale, WHITE);
 		DrawModelEx(wolf, battlefieldTiles[0][6].positions[0], YAW, 90, wolfScaleVec, WHITE);
@@ -382,8 +438,22 @@ void TurnCamera(bool right)
 	else if (cameraPositionIndex > 3) cameraPositionIndex = 0;
 
 	camera.position = camIsometricPositions[cameraPositionIndex];
-	camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
-	camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+	camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      
+	//camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          
+}
+
+void SetView(bool aIsBattlefieldView)
+{
+	if (aIsBattlefieldView)
+	{
+		if (isCamIsometric) camera.fovy = camIsometricBattlefieldFov;
+		else camera.fovy = camZenitalBattlefieldFov;
+	}
+	else
+	{
+		if (isCamIsometric) camera.fovy = camIsometricFortressFov;
+		else camera.fovy = camZenitalFortressFov;
+	}
 }
 
 void Deinitialize(void)
@@ -394,6 +464,8 @@ void Deinitialize(void)
 	UnloadTexture(backgroundTexture);
 
 	UnloadModel(tower);
+
+	UnloadModel(tileSelector);
 
 	UnloadModel(pig);
 	UnloadModel(wolf);
