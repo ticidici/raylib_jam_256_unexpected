@@ -59,6 +59,7 @@ jobs:
         path: ${{ env.PROJECT_RELEASE_PATH }}
         
     - name: Deploy to githug pages
+      if: ${{ github.ref_name == 'main' }}
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
