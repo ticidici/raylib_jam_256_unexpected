@@ -8,7 +8,7 @@ void EnemyUpdate(Enemy *enemy)
     Vector3 direction = Vector3Subtract(enemy->position, enemy->target);
     float distanceSqr = Vector3LengthSqr(direction);
     direction = Vector3Normalize(direction);
-    enemy->rotation = atan2f(direction.z, direction.x);
+    enemy->rotation = atan2f(direction.z, direction.x) * RAD2DEG;
     if (distanceSqr > (enemy->range * enemy->range) - 10.0f)
     {
         // Move behaviour
@@ -30,5 +30,5 @@ void EnemyUpdate(Enemy *enemy)
 
 void EnemyRender(Enemy *enemy)
 {
-    DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.25, 0.25, 0.25}, WHITE);
+    DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025, 0.025, 0.025}, WHITE);
 }

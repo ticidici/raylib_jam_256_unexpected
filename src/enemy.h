@@ -14,12 +14,12 @@ struct Enemy
    Vector3 position;
    float rotation; // degrees of yaw
    Vector3 target;
-   Model model;   
+   Model model;
 } typedef Enemy;
 
 // Public
-void EnemyUpdate(Enemy * enemy);
+void EnemyUpdate(Enemy *enemy);
 
-void EnemyRender(Enemy * enemy);
+void EnemyRender(Enemy *enemy);
 
 #endif
