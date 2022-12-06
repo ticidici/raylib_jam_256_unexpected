@@ -23,6 +23,13 @@ Tile GetTileSelected()
 }
 
 
+static Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE] = {0};
+
+Tile *TerrainGetTile(int x, int y)
+{
+    return &battlefieldTiles[x][y];
+}
+
 void TerrainInit()
 {
 
@@ -124,10 +131,7 @@ void TerrainUpdate()
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             Tile *tile = &battlefieldTiles[i][j];
-            for (int b = 0; b < tile->building.blockCount; b++)
-            {
-                BuildingUpdate(&tile->building);
-            }
+            BuildingUpdate(&tile->building);
         }
     }
 }
@@ -142,10 +146,7 @@ void TerrainRender()
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             Tile *tile = &battlefieldTiles[i][j];
-            for (int b = 0; b < tile->building.blockCount; b++)
-            {
-                BuildingRender(&tile->building.blocks[b], tile->position);
-            }
+            BuildingRender(&tile->building, tile->position);
             DrawModel(battlefieldTiles[i][j].tileModel, battlefieldTiles[i][j].position, 1.f, WHITE);
         }
     }
