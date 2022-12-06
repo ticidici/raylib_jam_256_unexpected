@@ -22,8 +22,6 @@ struct Tile
     // entity occupying?
 } typedef Tile;
 
-Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE];
-
 // Public
 void TerrainInit();
 
@@ -32,6 +30,8 @@ void TerrainRelease();
 void TerrainUpdate();
 
 void TerrainRender();
+
+Tile *TerrainGetTile(int x, int y);
 
 // Private
 void DrawGridCentered(float tileSpacing, int tileCount);
