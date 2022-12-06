@@ -12,15 +12,26 @@
 #define FORTRESS_LAST_TILE_INDEX BATTLEFIELD_SIZE - BATTLEFIELD_RING_WIDTH - 1
 #define BATTLEFIELD_LAST_TILE_INDEX BATTLEFIELD_SIZE - 1
 
+enum TileType
+{
+    GrassType,
+    DirtType,
+    WheatType,
+    WoodType,
+    ClayType,
+    LavaType
+} typedef TileType;
+
 struct Tile
 {
     Vector3 position;
     Model tileModel;
-
+    TileType tileType;
     Building building;
 
     // entity occupying?
 } typedef Tile;
+
 
 // Public
 void TerrainInit();

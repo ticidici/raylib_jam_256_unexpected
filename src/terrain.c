@@ -64,6 +64,7 @@ void TerrainInit()
                     if (randomValue < 35)
                     {
                         battlefieldTiles[i][j].tileModel = lavaTile;
+                        battlefieldTiles[i][j].tileType = LavaType;
                     }
                     // else if (randomValue < 55)
                     //{
@@ -72,6 +73,7 @@ void TerrainInit()
                     else
                     {
                         battlefieldTiles[i][j].tileModel = grass2Tile;
+                        battlefieldTiles[i][j].tileType = GrassType;
                     }
                 }
                 else
@@ -79,10 +81,12 @@ void TerrainInit()
                     if (randomValue < 35)
                     {
                         battlefieldTiles[i][j].tileModel = dirtGrayTile;
+                        battlefieldTiles[i][j].tileType = DirtType;
                     }
                     else
                     {
                         battlefieldTiles[i][j].tileModel = dirtBrownTile;
+                        battlefieldTiles[i][j].tileType = DirtType;
                     }
                 }
             }

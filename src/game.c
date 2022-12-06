@@ -24,6 +24,8 @@ static float pigScale = 0.025f;
 static Enemy enemies[30];
 static int enemiesCount = 0;
 
+bool showTileInfo = false;
+
 void Init()
 {
     InitWindow(screenWidth, screenHeight, "Unexpected");
@@ -103,6 +105,12 @@ void Update()
         EnemyUpdate(&enemies[i]);
     }
 
+    if (IsKeyPressed(KEY_I))
+    {
+        showTileInfo = !showTileInfo;
+    }
+
+
     // TODO: Update variables / Implement example logic at this point
     //----------------------------------------------------------------------------------
 
@@ -131,6 +139,15 @@ void Update()
         DrawTexture(cursorStraightTexture, GetMouseX() - 10, GetMouseY(), WHITE);
         if (IsCursorOnScreen()) HideCursor();
         else ShowCursor();
+
+        if (showTileInfo)
+        {
+            char* tileTypeString = "grass";
+            if(GetTileSelected().tileType == LavaType) tileTypeString = "lava";
+            else if(GetTileSelected().tileType == DirtType) tileTypeString = "dirt";
+
+            DrawText(tileTypeString, 0, 0, 20, RED);
+        }
 
         DrawFPS(232, 0);
     }
