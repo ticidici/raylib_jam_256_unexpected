@@ -51,6 +51,8 @@ static float camZenitalBattlefieldFov = 520.0f;
 static bool isCamIsometric = true;
 static bool isBattlefieldView = false;
 
+static bool isGridShown = false;
+
 static Vector3 YAW = {0, 1.0f, 0};
 
 static struct Tile
@@ -131,13 +133,13 @@ void Init()
         {
             for (int k = 0; k < 4; k++) // max height, 3 floors + something standing on top
             {
-                battlefieldTiles[i][j].positions[k].x = (i - MIDDLE_TILE_INDEX) * 40;
-                battlefieldTiles[i][j].positions[k].z = (j - MIDDLE_TILE_INDEX) * 40;
-                battlefieldTiles[i][j].positions[k].y = k * 20;
+                battlefieldTiles[i][j].positions[k].x = (i - MIDDLE_TILE_INDEX) * 40.0f;
+                battlefieldTiles[i][j].positions[k].z = (j - MIDDLE_TILE_INDEX) * 40.0f;
+                battlefieldTiles[i][j].positions[k].y = k * 20.0f;
 
+                int randomValue = GetRandomValue(0, 100);
                 if ((i >= FORTRESS_FIRST_TILE_INDEX && i <= FORTRESS_LAST_TILE_INDEX) && (j >= FORTRESS_FIRST_TILE_INDEX && j <= FORTRESS_LAST_TILE_INDEX))
                 {
-                    int randomValue = GetRandomValue(0, 100);
                     if (randomValue < 35)
                     {
                         battlefieldTiles[i][j].tileType = lavaTile;
@@ -153,7 +155,7 @@ void Init()
                 }
                 else
                 {
-                    if (GetRandomValue(0, 100) < 35)
+                    if (randomValue < 35)
                     {
                         battlefieldTiles[i][j].tileType = dirtGrayTile;
                     }
@@ -210,6 +212,11 @@ void Update()
         SetMouseScale(1.0f / (float)screenScale, 1.0f / (float)screenScale);
 
         prevScreenScale = screenScale;
+    }
+
+    if (IsKeyPressed(KEY_G))
+    {
+        isGridShown = !isGridShown;
     }
 
     bool cameraAngleChanged = false;
@@ -274,7 +281,6 @@ void Update()
 
         BeginMode3D(camera);
         ClearBackground(BLACK);
-        // DrawGrid(40.0f, 40.0f);
         // DrawTexture(towerTexture, 0, 0, WHITE);
 
         // corners
@@ -302,7 +308,10 @@ void Update()
             }
         }
 
-        // DrawModel(tower, towerPos, 10.0f, WHITE);
+        if (isGridShown)
+        {
+            DrawGridCentered(40.0f, BATTLEFIELD_SIZE);
+        }
 
         EndMode3D();
 
@@ -356,5 +365,23 @@ void SetView(bool aIsBattlefieldView)
             camera.fovy = camIsometricFortressFov;
         else
             camera.fovy = camZenitalFortressFov;
+    }
+}
+
+void DrawGridCentered(float tileSpacing, int tileCount)
+{
+    int middle = (tileCount - 1) / 2;//odd number
+    if (tileCount % 2 == 0) middle = tileCount / 2;
+    
+    for (int i = 0; i < tileCount + 1; i++)
+    {
+        Vector3 startPosVertical = { (i - middle) * tileSpacing - tileSpacing/2, 0.0f, (0 - middle) * tileSpacing - tileSpacing/2 };
+        Vector3 endPosVertical = { (i - middle) * tileSpacing - tileSpacing / 2, 0.0f, (tileCount - middle) * tileSpacing - tileSpacing / 2 };
+
+        Vector3 startPosHorizontal = { (0 - middle) * tileSpacing - tileSpacing/2, 0.0f, (i - middle) * tileSpacing - tileSpacing/2 };
+        Vector3 endPosHorizontal = { (tileCount - middle) * tileSpacing - tileSpacing/2, 0.0f, (i - middle) * tileSpacing - tileSpacing / 2 };
+
+        DrawLine3D(startPosVertical, endPosVertical, GREEN);
+        DrawLine3D(startPosHorizontal, endPosHorizontal, GREEN);
     }
 }
