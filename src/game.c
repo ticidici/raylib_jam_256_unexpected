@@ -10,11 +10,6 @@ static unsigned int prevScreenScale = 1;
 
 static RenderTexture2D target = {0}; // Initialized at init
 
-static Model red1;
-static Model red2;
-static Model red3;
-static Model red4;
-
 static Model pig;
 static Model wolf;
 
@@ -70,10 +65,6 @@ void Init()
 
     //-------- /CAM SETTINGS ---------
 
-    red1 = LoadModel("resources/red1.gltf");
-    red2 = LoadModel("resources/red2.gltf");
-    red3 = LoadModel("resources/red3.gltf");
-    red4 = LoadModel("resources/red4.gltf");
     pig = LoadModel("resources/pig.glb");
     wolf = LoadModel("resources/wolf.glb");
 
@@ -87,8 +78,8 @@ void Init()
         Enemy *enemy = &enemies[i];
         *enemy = (Enemy){0};
         enemy->speed = 10;
-        enemy->position = battlefieldTiles[i][6].positions[0];
-        enemy->target = battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][i].positions[0];
+        enemy->position = battlefieldTiles[i][6].position;
+        enemy->target = battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][i].position;
         enemy->model = wolf;
         enemy->coldown = 3.0;
         enemiesCount++;
@@ -103,11 +94,6 @@ void Release()
 
     UnloadModel(pig);
     UnloadModel(wolf);
-
-    UnloadModel(red1);
-    UnloadModel(red2);
-    UnloadModel(red3);
-    UnloadModel(red4);
 
     TerrainRelease();
 
@@ -205,19 +191,6 @@ void Update()
         BeginMode3D(camera);
         ClearBackground(BLACK);
         // DrawTexture(towerTexture, 0, 0, WHITE);
-
-        // corners
-        DrawModel(red1, battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].positions[0], 1.f, WHITE);
-        DrawModel(red2, battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].positions[0], 1.f, WHITE);
-        DrawModel(red3, battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].positions[0], 1.f, WHITE);
-        DrawModel(red4, battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].positions[0], 1.f, WHITE);
-
-        // center
-        DrawModel(red1, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[0], 1.f, WHITE);
-        DrawModel(red1, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[1], 1.f, WHITE);
-        DrawModel(red4, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[2], 1.f, WHITE);
-
-        DrawModel(pig, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[3], pigScale, WHITE);
 
         for (int i = 0; i < enemiesCount; i++)
         {

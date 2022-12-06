@@ -2,6 +2,7 @@
 #define TERRAIN_H
 
 #include "raylib.h"
+#include "building.h"
 
 #define FORTRESS_SIZE 7     // have to be odd numbers
 #define BATTLEFIELD_SIZE 13 // have to be odd numbers
@@ -13,8 +14,10 @@
 
 struct Tile
 {
-    Vector3 positions[4];
+    Vector3 position;
     Model tileType;
+
+    Building building;
 
     // entity occupying?
 } typedef Tile;

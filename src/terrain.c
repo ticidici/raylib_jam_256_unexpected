@@ -7,6 +7,11 @@ static Model lavaTile;
 static Model dirtBrownTile;
 static Model dirtGrayTile;
 
+static Model red1;
+static Model red2;
+static Model red3;
+static Model red4;
+
 static bool isGridShown = false;
 
 void TerrainInit()
@@ -20,15 +25,20 @@ void TerrainInit()
     dirtGrayTile = LoadModel("resources/dirtgray_tile.gltf");
     dirtBrownTile = LoadModel("resources/dirtbrown_tile.gltf");
 
+    red1 = LoadModel("resources/red1.gltf");
+    red2 = LoadModel("resources/red2.gltf");
+    red3 = LoadModel("resources/red3.gltf");
+    red4 = LoadModel("resources/red4.gltf");
+
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             for (int k = 0; k < 4; k++) // max height, 3 floors + something standing on top
             {
-                battlefieldTiles[i][j].positions[k].x = (i - MIDDLE_TILE_INDEX) * 4.0f;
-                battlefieldTiles[i][j].positions[k].z = (j - MIDDLE_TILE_INDEX) * 4.0f;
-                battlefieldTiles[i][j].positions[k].y = k * 2.0f;
+                battlefieldTiles[i][j].position.x = (i - MIDDLE_TILE_INDEX) * 4.0f;
+                battlefieldTiles[i][j].position.z = (j - MIDDLE_TILE_INDEX) * 4.0f;
+                battlefieldTiles[i][j].position.y = 0.f;
 
                 int randomValue = GetRandomValue(0, 100);
                 if ((i >= FORTRESS_FIRST_TILE_INDEX && i <= FORTRESS_LAST_TILE_INDEX) && (j >= FORTRESS_FIRST_TILE_INDEX && j <= FORTRESS_LAST_TILE_INDEX))
@@ -60,6 +70,20 @@ void TerrainInit()
             }
         }
     }
+
+    Building *building = &battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].building;
+    building->blocks[0].model = red1;
+    building->blockCount = 1;
+
+    Building *building2 = &battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].building;
+    building2->blocks[0].model = red2;
+    building2->blockCount = 1;
+
+    Building *building3 = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
+    building3->blocks[0].model = red1;
+    building3->blocks[1].model = red1;
+    building3->blocks[2].model = red4;
+    building3->blockCount = 3;
 }
 
 void TerrainRelease()
@@ -70,6 +94,10 @@ void TerrainRelease()
     UnloadModel(lavaTile);
     UnloadModel(dirtGrayTile);
     UnloadModel(dirtBrownTile);
+    UnloadModel(red1);
+    UnloadModel(red2);
+    UnloadModel(red3);
+    UnloadModel(red4);
 }
 
 void TerrainUpdate()
@@ -78,6 +106,17 @@ void TerrainUpdate()
     {
         isGridShown = !isGridShown;
     }
+    for (int i = 0; i < BATTLEFIELD_SIZE; i++)
+    {
+        for (int j = 0; j < BATTLEFIELD_SIZE; j++)
+        {
+            Tile *tile = &battlefieldTiles[i][j];
+            for (int b = 0; b < tile->building.blockCount; b++)
+            {
+                BuildingUpdate(&tile->building);
+            }
+        }
+    }
 }
 
 void TerrainRender()
@@ -85,13 +124,18 @@ void TerrainRender()
 
     DrawModel(grassTile, (Vector3){12, 0, 4}, 1.f, WHITE);
 
-    DrawModel(tileSelector, battlefieldTiles[9][9].positions[0], 1.f, WHITE);
+    DrawModel(tileSelector, battlefieldTiles[9][9].position, 1.f, WHITE);
 
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
-            DrawModel(battlefieldTiles[i][j].tileType, battlefieldTiles[i][j].positions[0], 1.f, WHITE);
+            Tile *tile = &battlefieldTiles[i][j];
+            for (int b = 0; b < tile->building.blockCount; b++)
+            {
+                BuildingRender(&tile->building.blocks[b], tile->position);
+            }
+            DrawModel(battlefieldTiles[i][j].tileType, battlefieldTiles[i][j].position, 1.f, WHITE);
         }
     }
 
