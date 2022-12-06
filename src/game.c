@@ -1,4 +1,5 @@
 #include "game.h"
+#include "enemy.h"
 
 static const int screenWidth = 256;
 static const int screenHeight = 256;
@@ -63,29 +64,16 @@ static struct Tile
     // entity occupying?
 };
 
-// still unused
-static struct Wolf
-{
-    Vector3 position;
-    float rotation; // degrees of yaw
-    Vector3 scale;
-    float speed;
-
-    struct Tile *tileOccupied;
-    Model model;
-};
-
 static struct Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE];
-
-static Vector3 towerPos = {0.0f, 0.0f, 0.0f};
 
 static Vector3 camPerspectivePos = {100.0f, 250.0, 100.0f};
 static float camPerspectiveFov = 60.0f;
 
 static float pigScale = 0.25f;
-static float wolfScale = 0.25f;
-static Vector3 wolfScaleVec = {0.25f, 0.25f, 0.25f};
 static float normalScale = 10.0f;
+
+static Enemy enemies[30];
+static int enemiesCount = 0;
 
 void Init()
 {
@@ -166,6 +154,19 @@ void Init()
                 }
             }
         }
+    }
+
+    int totalEnemies = 5;
+    for (int i = 0; i < totalEnemies; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        *enemy = (Enemy){0};
+        enemy->speed = 10;
+        enemy->position = battlefieldTiles[i][6].positions[0];
+        enemy->target = battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][i].positions[0];
+        enemy->model = wolf;
+        enemy->coldown = 3.0;
+        enemiesCount++;
     }
 }
 
@@ -269,6 +270,11 @@ void Update()
         }
     }
 
+    for (int i = 0; i < enemiesCount; i++)
+    {
+        EnemyUpdate(&enemies[i]);
+    }
+
     // TODO: Update variables / Implement example logic at this point
     //----------------------------------------------------------------------------------
 
@@ -297,8 +303,11 @@ void Update()
         DrawModel(tileSelector, battlefieldTiles[9][9].positions[0], normalScale, WHITE);
 
         DrawModel(pig, battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].positions[3], pigScale, WHITE);
-        DrawModelEx(wolf, battlefieldTiles[0][6].positions[0], YAW, 90, wolfScaleVec, WHITE);
-        DrawModelEx(wolf, battlefieldTiles[6][0].positions[0], YAW, 0, wolfScaleVec, WHITE);
+
+        for (int i = 0; i < enemiesCount; i++)
+        {
+            EnemyRender(&enemies[i]);
+        }
 
         for (int i = 0; i < BATTLEFIELD_SIZE; i++)
         {
@@ -370,16 +379,17 @@ void SetView(bool aIsBattlefieldView)
 
 void DrawGridCentered(float tileSpacing, int tileCount)
 {
-    int middle = (tileCount - 1) / 2;//odd number
-    if (tileCount % 2 == 0) middle = tileCount / 2;
-    
+    int middle = (tileCount - 1) / 2; // odd number
+    if (tileCount % 2 == 0)
+        middle = tileCount / 2;
+
     for (int i = 0; i < tileCount + 1; i++)
     {
-        Vector3 startPosVertical = { (i - middle) * tileSpacing - tileSpacing/2, 0.0f, (0 - middle) * tileSpacing - tileSpacing/2 };
-        Vector3 endPosVertical = { (i - middle) * tileSpacing - tileSpacing / 2, 0.0f, (tileCount - middle) * tileSpacing - tileSpacing / 2 };
+        Vector3 startPosVertical = {(i - middle) * tileSpacing - tileSpacing / 2, 0.0f, (0 - middle) * tileSpacing - tileSpacing / 2};
+        Vector3 endPosVertical = {(i - middle) * tileSpacing - tileSpacing / 2, 0.0f, (tileCount - middle) * tileSpacing - tileSpacing / 2};
 
-        Vector3 startPosHorizontal = { (0 - middle) * tileSpacing - tileSpacing/2, 0.0f, (i - middle) * tileSpacing - tileSpacing/2 };
-        Vector3 endPosHorizontal = { (tileCount - middle) * tileSpacing - tileSpacing/2, 0.0f, (i - middle) * tileSpacing - tileSpacing / 2 };
+        Vector3 startPosHorizontal = {(0 - middle) * tileSpacing - tileSpacing / 2, 0.0f, (i - middle) * tileSpacing - tileSpacing / 2};
+        Vector3 endPosHorizontal = {(tileCount - middle) * tileSpacing - tileSpacing / 2, 0.0f, (i - middle) * tileSpacing - tileSpacing / 2};
 
         DrawLine3D(startPosVertical, endPosVertical, GREEN);
         DrawLine3D(startPosHorizontal, endPosHorizontal, GREEN);
