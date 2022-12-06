@@ -4,6 +4,7 @@
 #include "raylib.h"
 
 // Public
+
 void Init();
 
 void Release();

@@ -15,7 +15,7 @@
 struct Tile
 {
     Vector3 position;
-    Model tileType;
+    Model tileModel;
 
     Building building;
 
@@ -23,6 +23,7 @@ struct Tile
 } typedef Tile;
 
 Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE];
+
 
 // Public
 void TerrainInit();
@@ -33,7 +34,10 @@ void TerrainUpdate();
 
 void TerrainRender();
 
+Tile GetTileSelected();
+
 // Private
 void DrawGridCentered(float tileSpacing, int tileCount);
+void UpdateTileSelector();
 
 #endif
