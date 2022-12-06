@@ -12,5 +12,9 @@ bool IsBattlefieldView();
 void SetView(bool aIsBattlefieldView);
 void TurnCamera(bool right);
 Camera GetCamera();
+
 void CameraInit();
+
+void CameraUpdate();
+
 #endif
