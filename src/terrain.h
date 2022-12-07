@@ -11,6 +11,7 @@
 #define FORTRESS_FIRST_TILE_INDEX BATTLEFIELD_RING_WIDTH
 #define FORTRESS_LAST_TILE_INDEX BATTLEFIELD_SIZE - BATTLEFIELD_RING_WIDTH - 1
 #define BATTLEFIELD_LAST_TILE_INDEX BATTLEFIELD_SIZE - 1
+#define TILE_HALF_WIDTH 2.0f
 
 enum TileType
 {
@@ -30,7 +31,6 @@ struct Tile
     Building building;
     int coordX;
     int coordY;
-
     // entity occupying?
 } typedef Tile;
 

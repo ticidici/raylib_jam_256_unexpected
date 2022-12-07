@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "camera.h"
+#include "terrain.h"
 
 bool IsPointInsideQuadInScreenSpace(Vector2 point, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3)
 {
@@ -25,6 +26,17 @@ bool IsPointInsideQuadInScreenSpace(Vector2 point, Vector3 v0, Vector3 v1, Vecto
         return true;
     }
     return false;
+}
+
+bool IsPointInsideTileInScreenSpace(Vector2 point, Tile* tile, float halfWidth)
+{
+    bool result = IsPointInsideQuadInScreenSpace(point,
+                (Vector3) { tile->position.x - halfWidth, tile->position.y, tile->position.z + halfWidth },
+                (Vector3) { tile->position.x - halfWidth, tile->position.y, tile->position.z - halfWidth },
+                (Vector3) { tile->position.x + halfWidth, tile->position.y, tile->position.z - halfWidth },
+                (Vector3) { tile->position.x + halfWidth, tile->position.y, tile->position.z + halfWidth });
+
+     return result;
 }
 
 #endif

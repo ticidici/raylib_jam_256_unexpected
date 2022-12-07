@@ -130,6 +130,8 @@ void TerrainRelease()
 
 void TerrainUpdate()
 {
+    bool tileJustDeselected = false;
+
     if (isTileSelected)
     {
         //if clicked on option confirm and deselect (even if it is not executed)
@@ -137,14 +139,19 @@ void TerrainUpdate()
         {
             //if button
             TerrainBuyTile(LavaType, tileHovered);
-            //else if outside
-            //isTileSelected = false;
+
+            if (!IsPointInsideTileInScreenSpace(GetMousePosition(), tileHovered, TILE_HALF_WIDTH))
+            {
+                isTileSelected = false;
+                tileJustDeselected = true;
+            }
         }
 
         //if clicked (outside?) or cancel button, deselect tile
         if (/*IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ||*/ IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || IsKeyPressed(KEY_ESCAPE))
         {
             isTileSelected = false;
+            tileJustDeselected = true;
             HideTileButtons();
         }
     }
@@ -152,7 +159,7 @@ void TerrainUpdate()
     //we update selector before doing anything with it
     UpdateTileSelector();
 
-    if (!isTileSelected)
+    if (!tileJustDeselected && !isTileSelected)
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -240,12 +247,7 @@ void UpdateTileSelector()
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             Tile* candidateTile = &battlefieldTiles[i][j];
-
-            tileFound = IsPointInsideQuadInScreenSpace(mousePosition,
-                (Vector3) { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f },
-                (Vector3) { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f },
-                (Vector3) { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f },
-                (Vector3) { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f });
+            tileFound = IsPointInsideTileInScreenSpace(mousePosition, candidateTile, TILE_HALF_WIDTH);
 
             if (tileFound)
             {           
