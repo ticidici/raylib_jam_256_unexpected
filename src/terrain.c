@@ -15,15 +15,18 @@ static Model red4;
 
 static bool isGridShown = false;
 
-static Tile tileSelected;
-
-Tile GetTileSelected()
-{
-    return tileSelected;
-}
-
+static Tile* tileHovered;
+static bool isTileSelected = false;
 
 static Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE] = {0};
+
+bool showHoveredTileInfo = false;
+
+
+Tile *TerrainGetTileSelected()
+{
+    return tileHovered;
+}
 
 Tile *TerrainGetTile(int x, int y)
 {
@@ -46,7 +49,7 @@ void TerrainInit()
     red3 = LoadModel("resources/red3.gltf");
     red4 = LoadModel("resources/red4.gltf");
 
-    tileSelected = battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX];
+    tileHovered = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX];
 
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
@@ -89,6 +92,8 @@ void TerrainInit()
                         battlefieldTiles[i][j].tileType = DirtType;
                     }
                 }
+                battlefieldTiles[i][j].coordX = i;
+                battlefieldTiles[i][j].coordY = j;
             }
         }
     }
@@ -124,7 +129,34 @@ void TerrainRelease()
 
 void TerrainUpdate()
 {
+    if (isTileSelected)
+    {
+        //if clicked on option confirm and deselect (even if it is not executed)
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            //if button
+            TerrainBuyTile(LavaType, tileHovered);
+            //else if outside
+            //isTileSelected = false;
+        }
+
+        //if clicked (outside?) or cancel button, deselect tile
+        if (/*IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ||*/ IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || IsKeyPressed(KEY_ESCAPE))
+        {
+            isTileSelected = false;
+        }
+    }
+
+    //we update selector before doing anything with it
     UpdateTileSelector();
+
+    if (!isTileSelected)
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            isTileSelected = true;
+        }
+    }
 
     if (IsKeyPressed(KEY_G))
     {
@@ -138,12 +170,17 @@ void TerrainUpdate()
             BuildingUpdate(&tile->building);
         }
     }
+
+    if (IsKeyPressed(KEY_I) && !isTileSelected)
+    {
+        showHoveredTileInfo = !showHoveredTileInfo;
+    }
 }
 
 void TerrainRender()
 {
 
-    DrawModel(tileSelector, tileSelected.position, 1.f, WHITE);
+    DrawModel(tileSelector, tileHovered->position, 1.f, WHITE);
 
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
@@ -182,6 +219,8 @@ void DrawGridCentered(float tileSpacing, int tileCount)
 
 void UpdateTileSelector()
 {
+    if (isTileSelected) return;
+
     bool tileFound = false;
     Vector2 mousePosition = GetMousePosition();
     Camera camera = GetCamera();
@@ -190,12 +229,12 @@ void UpdateTileSelector()
     {
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
-            Tile candidateTile = battlefieldTiles[i][j];
+            Tile* candidateTile = &battlefieldTiles[i][j];
 
-            Vector3 vertex0 = { candidateTile.position.x - 2.0f, candidateTile.position.y, candidateTile.position.z + 2.0f };
-            Vector3 vertex1 = { candidateTile.position.x - 2.0f, candidateTile.position.y, candidateTile.position.z - 2.0f };
-            Vector3 vertex2 = { candidateTile.position.x + 2.0f, candidateTile.position.y, candidateTile.position.z - 2.0f };
-            Vector3 vertex3 = { candidateTile.position.x + 2.0f, candidateTile.position.y, candidateTile.position.z + 2.0f };
+            Vector3 vertex0 = { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f };
+            Vector3 vertex1 = { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f };
+            Vector3 vertex2 = { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f };
+            Vector3 vertex3 = { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f };
 
             //by screen pos
             Vector2 vertex0Screen = GetWorldToScreen(vertex0, camera);
@@ -210,12 +249,43 @@ void UpdateTileSelector()
             if (CheckCollisionPointTriangle(mousePosition, vertex0Screen, vertex1Screen, vertex2Screen)
                 || CheckCollisionPointTriangle(mousePosition, vertex0Screen, vertex2Screen, vertex3Screen))
             {
-                tileSelected = candidateTile;
+                tileHovered = candidateTile;
                 tileFound = true;
                 break;
             }
         }
 
         if (tileFound) break;
+    }
+}
+
+bool ShouldShowTileInfo()
+{
+    if (isTileSelected) return true;
+    return showHoveredTileInfo;
+}
+
+int TerrainGetTileCost(TileType tileType)
+{
+
+}
+
+void TerrainBuyTile(TileType tileType, Tile* tile)
+{
+    if (tile->coordX < FORTRESS_FIRST_TILE_INDEX || tile->coordX > FORTRESS_LAST_TILE_INDEX
+        || tile->coordY < FORTRESS_FIRST_TILE_INDEX || tile->coordY > FORTRESS_LAST_TILE_INDEX)
+    {
+        //TODO throw sound or message
+        return;
+    }
+
+    switch (tileType)
+    {
+        case LavaType:
+            tile->tileModel = lavaTile;
+            break;
+        case GrassType:
+            tile->tileModel = grassTile;
+            break;
     }
 }

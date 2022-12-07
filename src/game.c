@@ -9,6 +9,8 @@ static const int screenHeight = 256;
 
 static RenderTexture2D target = {0}; // Initialized at init
 
+static bool isPaused = false;
+
 static Texture cursorTexture;
 static Texture cursorStraightTexture;
 
@@ -23,8 +25,6 @@ static float pigScale = 0.025f;
 
 static Enemy enemies[30];
 static int enemiesCount = 0;
-
-bool showTileInfo = false;
 
 void Init()
 {
@@ -96,28 +96,30 @@ void Update()
         SetPreviousScreenScale(screenScale);
     }
 
-    CameraUpdate();
-
-    TerrainUpdate();
-
-    for (int i = 0; i < enemiesCount; i++)
-    {
-        EnemyUpdate(&enemies[i]);
-    }
-
-    if (IsKeyPressed(KEY_I))
-    {
-        showTileInfo = !showTileInfo;
-    }
-
-
-    // TODO: Update variables / Implement example logic at this point
+    // Update variables / Implement example logic at this point
     //----------------------------------------------------------------------------------
+
+    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P))
+    {
+        isPaused = !isPaused;
+    }
+
+    if (!isPaused)
+    {
+        CameraUpdate();
+
+        TerrainUpdate();
+
+        for (int i = 0; i < enemiesCount; i++)
+        {
+            EnemyUpdate(&enemies[i]);
+        }
+    }
 
     // Draw
     //----------------------------------------------------------------------------------
-    // Render all screen to texture (for scaling)
 
+    // Render all screen to texture (for scaling)
     BeginTextureMode(target);
     {
 
@@ -136,20 +138,29 @@ void Update()
         //DrawText(TextFormat("(%04f,%04f)", mousePosition.x, mousePosition.y), 0, 0, 20, RED);
         //DrawCircleLines(GetMouseX(), GetMouseY(), 5.0f, MAROON);
         //DrawTexture(cursorTexture, GetMouseX() - 6, GetMouseY() - 2, WHITE);
-        DrawTexture(cursorStraightTexture, GetMouseX() - 10, GetMouseY(), WHITE);
-        if (IsCursorOnScreen()) HideCursor();
-        else ShowCursor();
+       
 
-        if (showTileInfo)
+        if (ShouldShowTileInfo())
         {
             char* tileTypeString = "grass";
-            if(GetTileSelected().tileType == LavaType) tileTypeString = "lava";
-            else if(GetTileSelected().tileType == DirtType) tileTypeString = "dirt";
+            if(TerrainGetTileSelected()->tileType == LavaType) tileTypeString = "lava";
+            else if(TerrainGetTileSelected()->tileType == DirtType) tileTypeString = "dirt";
 
             DrawText(tileTypeString, 0, 0, 20, RED);
         }
 
+
+        if (isPaused)
+        {
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
+            DrawText("GAME PAUSED", 66, 98, 18, MAROON);
+        }
+
         DrawFPS(232, 0);
+
+        DrawTexture(cursorStraightTexture, GetMouseX() - 10, GetMouseY(), WHITE);
+        if (IsCursorOnScreen()) HideCursor();
+        else ShowCursor();
     }
 
     EndTextureMode();

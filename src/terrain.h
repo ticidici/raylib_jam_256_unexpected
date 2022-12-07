@@ -28,6 +28,8 @@ struct Tile
     Model tileModel;
     TileType tileType;
     Building building;
+    int coordX;
+    int coordY;
 
     // entity occupying?
 } typedef Tile;
@@ -42,8 +44,12 @@ void TerrainUpdate();
 
 void TerrainRender();
 
-Tile GetTileSelected();
+Tile *TerrainGetTileSelected();
 Tile *TerrainGetTile(int x, int y);
+int TerrainGetTileCost(TileType tileType);
+void TerrainBuyTile(TileType tileType, Tile* tile);
+bool ShouldShowTileInfo();
+
 
 // Private
 void DrawGridCentered(float tileSpacing, int tileCount);
