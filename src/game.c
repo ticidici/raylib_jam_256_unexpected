@@ -2,6 +2,8 @@
 #include "enemy.h"
 #include "terrain.h"
 #include "camera.h"
+#include "uiManager.h"
+
 #include "raymath.h"
 
 static const int screenWidth = 256;
@@ -10,9 +12,6 @@ static const int screenHeight = 256;
 static RenderTexture2D target = {0}; // Initialized at init
 
 static bool isPaused = false;
-
-static Texture cursorTexture;
-static Texture cursorStraightTexture;
 
 static Model pig;
 static Model wolf;
@@ -34,12 +33,12 @@ void Init()
 
     CameraInit();
 
+    UiInit();
+
     pig = LoadModel("resources/pig.glb");
     wolf = LoadModel("resources/wolf.glb");
 
     backgroundTexture = LoadTexture("resources/background.png");
-    cursorTexture = LoadTexture("resources/cursor.png");
-    cursorStraightTexture = LoadTexture("resources/cursor_straight.png");
 
     TerrainInit();
 
@@ -62,8 +61,6 @@ void Release()
     UnloadRenderTexture(target);
 
     UnloadTexture(backgroundTexture);
-    UnloadTexture(cursorTexture);
-    UnloadTexture(cursorStraightTexture);
 
     UnloadModel(pig);
     UnloadModel(wolf);
@@ -116,6 +113,8 @@ void Update()
         }
     }
 
+    UiUpdate(isPaused);
+
     // Draw
     //----------------------------------------------------------------------------------
 
@@ -135,32 +134,8 @@ void Update()
 
         EndMode3D();
 
-        //DrawText(TextFormat("(%04f,%04f)", mousePosition.x, mousePosition.y), 0, 0, 20, RED);
-        //DrawCircleLines(GetMouseX(), GetMouseY(), 5.0f, MAROON);
-        //DrawTexture(cursorTexture, GetMouseX() - 6, GetMouseY() - 2, WHITE);
-       
 
-        if (ShouldShowTileInfo())
-        {
-            char* tileTypeString = "grass";
-            if(TerrainGetTileSelected()->tileType == LavaType) tileTypeString = "lava";
-            else if(TerrainGetTileSelected()->tileType == DirtType) tileTypeString = "dirt";
-
-            DrawText(tileTypeString, 0, 0, 20, RED);
-        }
-
-
-        if (isPaused)
-        {
-            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
-            DrawText("GAME PAUSED", 66, 98, 18, MAROON);
-        }
-
-        DrawFPS(232, 0);
-
-        DrawTexture(cursorStraightTexture, GetMouseX() - 10, GetMouseY(), WHITE);
-        if (IsCursorOnScreen()) HideCursor();
-        else ShowCursor();
+        UiRender(isPaused);       
     }
 
     EndTextureMode();

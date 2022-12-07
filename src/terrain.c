@@ -1,5 +1,5 @@
 #include "terrain.h"
-#include "camera.h"
+#include "utils.h"
 
 static Model tileSelector;
 static Model grassTile;
@@ -223,34 +223,21 @@ void UpdateTileSelector()
 
     bool tileFound = false;
     Vector2 mousePosition = GetMousePosition();
-    Camera camera = GetCamera();
-    unsigned int screenScale = GetCurrentScreenScale();
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             Tile* candidateTile = &battlefieldTiles[i][j];
 
-            Vector3 vertex0 = { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f };
-            Vector3 vertex1 = { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f };
-            Vector3 vertex2 = { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f };
-            Vector3 vertex3 = { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f };
+            tileFound = IsPointInsideQuadInScreenSpace(mousePosition,
+                (Vector3) { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f },
+                (Vector3) { candidateTile->position.x - 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f },
+                (Vector3) { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z - 2.0f },
+                (Vector3) { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f });
 
-            //by screen pos
-            Vector2 vertex0Screen = GetWorldToScreen(vertex0, camera);
-            vertex0Screen = (Vector2){ vertex0Screen.x / screenScale , vertex0Screen.y / screenScale };
-            Vector2 vertex1Screen = GetWorldToScreen(vertex1, camera);
-            vertex1Screen = (Vector2){ vertex1Screen.x / screenScale , vertex1Screen.y / screenScale };
-            Vector2 vertex2Screen = GetWorldToScreen(vertex2, camera);
-            vertex2Screen = (Vector2){ vertex2Screen.x / screenScale , vertex2Screen.y / screenScale };
-            Vector2 vertex3Screen = GetWorldToScreen(vertex3, camera);
-            vertex3Screen = (Vector2){ vertex3Screen.x / screenScale , vertex3Screen.y / screenScale };
-
-            if (CheckCollisionPointTriangle(mousePosition, vertex0Screen, vertex1Screen, vertex2Screen)
-                || CheckCollisionPointTriangle(mousePosition, vertex0Screen, vertex2Screen, vertex3Screen))
+            if (tileFound)
             {
                 tileHovered = candidateTile;
-                tileFound = true;
                 break;
             }
         }
@@ -267,7 +254,7 @@ bool ShouldShowTileInfo()
 
 int TerrainGetTileCost(TileType tileType)
 {
-
+    //TODO
 }
 
 void TerrainBuyTile(TileType tileType, Tile* tile)
