@@ -1,5 +1,6 @@
 #include "terrain.h"
 #include "utils.h"
+#include "uiManager.h"
 
 static Model tileSelector;
 static Model grassTile;
@@ -144,6 +145,7 @@ void TerrainUpdate()
         if (/*IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ||*/ IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || IsKeyPressed(KEY_ESCAPE))
         {
             isTileSelected = false;
+            HideTileButtons();
         }
     }
 
@@ -154,7 +156,17 @@ void TerrainUpdate()
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            isTileSelected = true;
+            //if it's outside the fortress we cannot select, just switch the tile info toggle
+            if (tileHovered->coordX < FORTRESS_FIRST_TILE_INDEX || tileHovered->coordX > FORTRESS_LAST_TILE_INDEX
+                || tileHovered->coordY < FORTRESS_FIRST_TILE_INDEX || tileHovered->coordY > FORTRESS_LAST_TILE_INDEX)
+            {
+                showHoveredTileInfo = !showHoveredTileInfo;
+            }
+            else
+            {
+                isTileSelected = true;
+                ShowTileButtons();
+            }
         }
     }
 
@@ -236,13 +248,12 @@ void UpdateTileSelector()
                 (Vector3) { candidateTile->position.x + 2.0f, candidateTile->position.y, candidateTile->position.z + 2.0f });
 
             if (tileFound)
-            {
+            {           
                 tileHovered = candidateTile;
-                break;
+                return;
             }
         }
-
-        if (tileFound) break;
+        //if (tileFound) return;
     }
 }
 

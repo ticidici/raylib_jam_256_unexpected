@@ -33,7 +33,7 @@ void Init()
 
     CameraInit();
 
-    UiInit();
+    UiInit(screenWidth, screenHeight);
 
     pig = LoadModel("resources/pig.glb");
     wolf = LoadModel("resources/wolf.glb");
