@@ -31,7 +31,7 @@ unsigned int GetPreviousScreenScale() { return prevScreenScale; }
 
 unsigned int GetCurrentScreenScale() { return screenScale; }
 
-void SetPreviousScreenScale(unsigned int scale) { screenScale = scale; }
+void SetPreviousScreenScale(unsigned int scale) { prevScreenScale = scale; }
 
 void SetCurrentScreenScale(unsigned int scale) { screenScale = scale; }
 
