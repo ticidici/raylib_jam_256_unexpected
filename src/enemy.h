@@ -7,9 +7,11 @@ struct Enemy
 {
    int hp;
    int damage;
-   float coldown;
    double lastAttackTime;
-   float speed;
+   int x;
+   int y;
+   double lastMoveTime;
+   bool lastMoveDirX;
    float range;
    Vector3 position;
    float rotation; // degrees of yaw
