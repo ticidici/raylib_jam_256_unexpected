@@ -124,8 +124,21 @@ void EnemyUpdateOne(Enemy *enemy)
             EnemyGetTargetDir(enemy, MIDDLE_TILE_INDEX, MIDDLE_TILE_INDEX, &dirX, &dirY);
             enemy->rotationTarget = EnemyGetTargetRotation(dirX, dirY);
 
-            enemy->x += dirX;
-            enemy->y += dirY;
+            int nextX = enemy->x + dirX;
+            int nextY = enemy->y + dirY;
+
+            Tile *nextTile = TerrainGetTile(nextX, nextY);
+            if (nextTile->enemy)
+            {
+                // Tile already has an enemy, wait for his moves
+            }
+            else
+            {
+                tile->enemy = 0;
+                enemy->x = nextX;
+                enemy->y = nextY;
+                nextTile->enemy = enemy;
+            }
         }
     }
 }
@@ -152,6 +165,11 @@ Enemy *FindClosestEnemy(int tileX, int tileY)
 
 void EnemySpawn(int tileX, int tileY)
 {
+    Tile *tile = TerrainGetTile(tileX, tileY);
+    if (tile->enemy != 0 || tile->building.blockCount > 0) // Can not spawn on an occupied tile
+    {
+        return;
+    }
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         if (!(&enemies[i])->alive)
@@ -159,10 +177,11 @@ void EnemySpawn(int tileX, int tileY)
             Enemy enemy = {0};
             enemy.x = tileX;
             enemy.y = tileY;
-            enemy.position = TerrainGetTile(tileX, tileY)->position;
+            enemy.position = tile->position;
             enemy.alive = true;
             enemy.model = wolf;
             enemies[i] = enemy;
+            tile->enemy = &enemy;
             return;
         }
     }
