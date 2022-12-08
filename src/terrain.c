@@ -33,6 +33,10 @@ Tile *TerrainGetTileSelected()
 
 Tile *TerrainGetTile(int x, int y)
 {
+    if (x < 0 || x >= BATTLEFIELD_SIZE || y < 0 || y > BATTLEFIELD_SIZE)
+    {
+        return 0;
+    }
     return &battlefieldTiles[x][y];
 }
 

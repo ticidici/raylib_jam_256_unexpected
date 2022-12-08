@@ -18,10 +18,16 @@ void EnemyInit()
 {
     wolf = LoadModel("resources/wolf.glb");
 
-    EnemySpawn(0, 0);
-    EnemySpawn(12, 0);
-    EnemySpawn(0, 12);
-    EnemySpawn(12, 12);
+    for (int x = 0; x < BATTLEFIELD_SIZE; x++)
+    {
+        for (int y = 0; y < BATTLEFIELD_SIZE; y++)
+        {
+            if (x == 0 || x == BATTLEFIELD_SIZE - 1 || y == 0 || y == BATTLEFIELD_SIZE - 1)
+            {
+                EnemySpawn(x, y);
+            }
+        }
+    }
 }
 
 void EnemyRelease()
@@ -53,11 +59,11 @@ void EnemyUpdateOne(Enemy *enemy)
     Tile *tileS = TerrainGetTile(enemy->x, enemy->y + 1);
     Tile *tileW = TerrainGetTile(enemy->x - 1, enemy->y);
 
-    Tile *target = (tileN->building.blockCount > 0)   ? tileN
-                   : (tileE->building.blockCount > 0) ? tileE
-                   : (tileS->building.blockCount > 0) ? tileS
-                   : (tileW->building.blockCount > 0) ? tileW
-                                                      : 0;
+    Tile *target = (tileN && tileN->building.blockCount > 0)   ? tileN
+                   : (tileE && tileE->building.blockCount > 0) ? tileE
+                   : (tileS && tileS->building.blockCount > 0) ? tileS
+                   : (tileW && tileW->building.blockCount > 0) ? tileW
+                                                               : 0;
 
     Tile *tile = TerrainGetTile(enemy->x, enemy->y);
 
@@ -182,7 +188,7 @@ void EnemyGetTargetDir(Enemy *enemy, int tileX, int tileY, int *dirX, int *dirY)
 float EnemyGetTargetRotation(int x, int y)
 {
     return x == 1    ? 90
-           : x == -1 ? -90
+           : x == -1 ? 270
            : y == 1  ? 0
                      : 180;
 }
