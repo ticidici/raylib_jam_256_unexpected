@@ -74,7 +74,7 @@ void EnemyUpdate(Enemy *enemy)
         {
             enemy->lastAttackTime = now;
             enemy->lastMoveTime = now;
-            target->building.blockCount--;
+            BuildingDestroyBlock(&target->building);
         }
     }
     else

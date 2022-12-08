@@ -22,11 +22,13 @@ struct Building
 {
     Block blocks[3];
     int blockCount;
-
+    float destroyOffset;
 } typedef Building;
 
 void BuildingUpdate(Building *building);
 
 void BuildingRender(Building *building, Vector3 position);
+
+void BuildingDestroyBlock(Building *building);
 
 #endif
