@@ -49,12 +49,19 @@ void EnemyUpdate(Enemy *enemy)
     }
 
     float positionIncrement = ENEMY_MOVEMENT_SPEED * delta;
-    if (Vector3Distance(tile->position, enemy->position) > positionIncrement)
+    Vector2 enemyPos = {enemy->position.x, enemy->position.z};
+    Vector2 tilePos = {tile->position.x, tile->position.z};
+    float tileDistance = Vector2Distance(enemyPos, tilePos);
+    if (tileDistance > positionIncrement)
     {
         // Move
-        Vector3 dir = Vector3Normalize(Vector3Subtract(tile->position, enemy->position));
-        Vector3 increment = Vector3Scale(dir, positionIncrement);
-        enemy->position = Vector3Add(enemy->position, increment);
+        Vector2 dir = Vector2Normalize(Vector2Subtract(tilePos, enemyPos));
+        Vector2 increment = Vector2Scale(dir, positionIncrement);
+        enemy->position.x += increment.x;
+        enemy->position.z += increment.y;
+
+        float x = ((TILE_HALF_WIDTH * 2) - tileDistance) / (TILE_HALF_WIDTH * 2);
+        enemy->position.y = (1 - (x * x - x + 1)) * 6.0f;
     }
     else if (target != 0)
     {
