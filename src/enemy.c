@@ -1,6 +1,7 @@
 #include "enemy.h"
 #include "raymath.h"
 #include "terrain.h"
+#include <stdlib.h>
 
 static Vector3 YAW = {0, 1.0f, 0};
 
