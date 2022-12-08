@@ -9,7 +9,6 @@ struct RectangleSettings
     float width;
     float height;
     Color color;
-    float roundness;
     bool isEnabled;
 } typedef RectangleSettings;
 
@@ -21,6 +20,9 @@ void UiShowTileButtons();
 void UiHideTileButtons();
 
 bool UiIsTileGrassButtonPressed();
+bool UiIsTileWheatButtonPressed();
+bool UiIsTileWoodButtonPressed();
+bool UiIsTileClayButtonPressed();
 bool UiIsTileLavaButtonPressed();
 
 //private

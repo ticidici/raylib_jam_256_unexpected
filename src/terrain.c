@@ -4,6 +4,7 @@
 
 static Model tileSelector;
 static Model grassTile;
+static Model grassAltTile;
 static Model lavaTile;
 static Model dirtBrownTile;
 static Model dirtGrayTile;
@@ -11,10 +12,9 @@ static Model wheatTile;
 static Model woodTile;
 static Model clayTile;
 
-static Model red1;
-static Model red2;
-static Model red3;
-static Model red4;
+static Model strawCube;
+static Model stickCube;
+static Model brickCube;
 
 static bool isGridShown = false;
 
@@ -42,14 +42,17 @@ void TerrainInit()
     tileSelector = LoadModel("resources/tile_selector.gltf");
 
     grassTile = LoadModel("resources/grass2_tile.gltf");
+    grassAltTile = LoadModel("resources/grass3_tile.gltf");
     lavaTile = LoadModel("resources/lava_tile.gltf");
+    wheatTile = LoadModel("resources/wheat_tile.gltf");
+    woodTile = LoadModel("resources/wood_tile.gltf");
+    clayTile = LoadModel("resources/clay_tile.gltf");
     dirtGrayTile = LoadModel("resources/dirtgray_tile.gltf");
     dirtBrownTile = LoadModel("resources/dirtbrown_tile.gltf");
 
-    red1 = LoadModel("resources/red1.gltf");
-    red2 = LoadModel("resources/red2.gltf");
-    red3 = LoadModel("resources/red3.gltf");
-    red4 = LoadModel("resources/red4.gltf");
+    strawCube = LoadModel("resources/straw_cube.gltf");
+    stickCube = LoadModel("resources/stick_cube.gltf");
+    brickCube = LoadModel("resources/brick_cube.gltf");
 
     tileHovered = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX];
 
@@ -66,32 +69,43 @@ void TerrainInit()
                 int randomValue = GetRandomValue(0, 100);
                 if ((i >= FORTRESS_FIRST_TILE_INDEX && i <= FORTRESS_LAST_TILE_INDEX) && (j >= FORTRESS_FIRST_TILE_INDEX && j <= FORTRESS_LAST_TILE_INDEX))
                 {
-                    if (randomValue < 35)
+                    if (randomValue < 10)
                     {
                         battlefieldTiles[i][j].tileModel = lavaTile;
                         battlefieldTiles[i][j].tileType = LavaType;
                     }
-                    // else if (randomValue < 55)
-                    //{
-                    //	battlefieldTiles[i][j].tileModel = grassTile;
-                    // }
+                    else if (randomValue < 20)
+                    {
+                        battlefieldTiles[i][j].tileModel = wheatTile;
+                        battlefieldTiles[i][j].tileType = WheatType;
+                    }
+                    else if (randomValue < 30)
+                    {
+                        battlefieldTiles[i][j].tileModel = woodTile;
+                        battlefieldTiles[i][j].tileType = WoodType;
+                    }
+                    else if (randomValue < 40)
+                    {
+                        battlefieldTiles[i][j].tileModel = clayTile;
+                        battlefieldTiles[i][j].tileType = ClayType;
+                    }
                     else
                     {
-                        battlefieldTiles[i][j].tileModel = grassTile;
+                        if (GetRandomValue(0, 100) < 50) battlefieldTiles[i][j].tileModel = grassTile;
+                        else battlefieldTiles[i][j].tileModel = grassAltTile;
                         battlefieldTiles[i][j].tileType = GrassType;
                     }
                 }
                 else
                 {
+                    battlefieldTiles[i][j].tileType = DirtType;
                     if (randomValue < 35)
                     {
                         battlefieldTiles[i][j].tileModel = dirtGrayTile;
-                        battlefieldTiles[i][j].tileType = DirtType;
                     }
                     else
                     {
                         battlefieldTiles[i][j].tileModel = dirtBrownTile;
-                        battlefieldTiles[i][j].tileType = DirtType;
                     }
                 }
                 battlefieldTiles[i][j].coordX = i;
@@ -101,34 +115,45 @@ void TerrainInit()
     }
 
     Building *building = &battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].building;
-    building->blocks[0].model = red1;
+    building->blocks[0].model = strawCube;
     building->blockCount = 1;
 
     Building *building2 = &battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].building;
-    building2->blocks[0].model = red2;
+    building2->blocks[0].model = stickCube;
     building2->blockCount = 1;
-
     Building *building3 = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
-    building3->blocks[0].model = red1;
-    building3->blocks[1].model = red1;
-    building3->blocks[2].model = red4;
+    building3->blocks[0].model = strawCube;
+    building3->blocks[1].model = brickCube;
+    building3->blocks[2].model = stickCube;
     building3->blockCount = 3;
+
+    Building* building4 = &battlefieldTiles[7][6].building;
+    building4->blocks[0].model = stickCube;
+    building4->blocks[1].model = brickCube;
+    building4->blockCount = 2;
+
+    Building* building5 = &battlefieldTiles[8][7].building;
+    building5->blocks[0].model = brickCube;
+    building5->blocks[1].model = brickCube;
+    building5->blocks[2].model = brickCube;
+    building5->blockCount = 3;
+
 }
 
 void TerrainRelease()
 {
     UnloadModel(tileSelector);
     UnloadModel(grassTile);
+    UnloadModel(grassAltTile);
     UnloadModel(lavaTile);
     UnloadModel(dirtGrayTile);
     UnloadModel(dirtBrownTile);
     UnloadModel(wheatTile);
     UnloadModel(woodTile);
     UnloadModel(clayTile);
-    UnloadModel(red1);
-    UnloadModel(red2);
-    UnloadModel(red3);
-    UnloadModel(red4);
+    UnloadModel(strawCube);
+    UnloadModel(stickCube);
+    UnloadModel(brickCube);
 }
 
 void TerrainUpdate()
@@ -145,6 +170,18 @@ void TerrainUpdate()
             {
                 TerrainBuyTile(GrassType, tileHovered);
 
+            }
+            else if (UiIsTileWheatButtonPressed())
+            {
+                TerrainBuyTile(WheatType, tileHovered);
+            }
+            else if (UiIsTileWoodButtonPressed())
+            {
+                TerrainBuyTile(WoodType, tileHovered);
+            }
+            else if (UiIsTileClayButtonPressed())
+            {
+                TerrainBuyTile(ClayType, tileHovered);
             }
             else if (UiIsTileLavaButtonPressed())
             {
@@ -285,6 +322,8 @@ int TerrainGetTileCost(TileType tileType)
 
 void TerrainBuyTile(TileType tileType, Tile* tile)
 {
+    if (tileType == tile->tileType) return;
+
     if (tile->coordX < FORTRESS_FIRST_TILE_INDEX || tile->coordX > FORTRESS_LAST_TILE_INDEX
         || tile->coordY < FORTRESS_FIRST_TILE_INDEX || tile->coordY > FORTRESS_LAST_TILE_INDEX)
     {
@@ -296,7 +335,8 @@ void TerrainBuyTile(TileType tileType, Tile* tile)
     switch (tileType)
     {
         case GrassType:
-            tile->tileModel = grassTile;
+            if(GetRandomValue(0, 100) < 50) tile->tileModel = grassTile;
+            else tile->tileModel = grassAltTile;
             break;
         case LavaType:
             tile->tileModel = lavaTile;
