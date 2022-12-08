@@ -14,7 +14,6 @@ static RenderTexture2D target = {0}; // Initialized at init
 static bool isPaused = false;
 
 static Model pig;
-static Model wolf;
 
 static Texture2D backgroundTexture;
 
@@ -22,8 +21,6 @@ static Vector3 YAW = {0, 1.0f, 0};
 
 static float pigScale = 0.025f;
 
-static Enemy enemies[30];
-static int enemiesCount = 0;
 
 void Init()
 {
@@ -36,23 +33,11 @@ void Init()
     UiInit(screenWidth, screenHeight);
 
     pig = LoadModel("resources/pig.glb");
-    wolf = LoadModel("resources/wolf.glb");
 
     backgroundTexture = LoadTexture("resources/background.png");
 
     TerrainInit();
-
-    int totalEnemies = 1;
-    for (int i = 0; i < totalEnemies; i++)
-    {
-        Enemy *enemy = &enemies[i];
-        *enemy = (Enemy){0};
-        enemy->position = TerrainGetTile(i, i)->position;
-        enemy->x = i;
-        enemy->y = i;
-        enemy->model = wolf;
-        enemiesCount++;
-    }
+    EnemyInit();
 }
 
 void Release()
@@ -62,8 +47,8 @@ void Release()
     UnloadTexture(backgroundTexture);
 
     UnloadModel(pig);
-    UnloadModel(wolf);
 
+    EnemyRelease();
     TerrainRelease();
 
     CloseWindow();
@@ -106,10 +91,7 @@ void Update()
 
         TerrainUpdate();
 
-        for (int i = 0; i < enemiesCount; i++)
-        {
-            EnemyUpdate(&enemies[i]);
-        }
+        EnemyUpdate();
     }
 
     UiUpdate(isPaused);
@@ -124,10 +106,8 @@ void Update()
         BeginMode3D(GetCamera());
         ClearBackground(BLACK);
 
-        for (int i = 0; i < enemiesCount; i++)
-        {
-            EnemyRender(&enemies[i]);
-        }
+
+        EnemyRender();
 
         TerrainRender();
 

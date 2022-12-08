@@ -9,7 +9,53 @@ static Vector3 YAW = {0, 1.0f, 0};
 #define ENEMY_MOVEMENT_SPEED 10.0f
 #define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 90.0f)
 
-void EnemyUpdate(Enemy *enemy)
+#define ENEMY_COUNT 100
+static Enemy enemies[ENEMY_COUNT];
+static Model wolf;
+
+void EnemyInit()
+{
+    wolf = LoadModel("resources/wolf.glb");
+
+    int totalEnemies = 1;
+
+    Enemy *enemy = &enemies[0];
+    *enemy = (Enemy){0};
+    enemy->position = TerrainGetTile(0, 0)->position;
+    enemy->x = 0;
+    enemy->y = 0;
+    enemy->model = wolf;
+    enemy->alive = true;
+    /*for (int i = 0; i < totalEnemies; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        *enemy = (Enemy){0};
+        enemy->position = TerrainGetTile(i, i)->position;
+        enemy->x = i;
+        enemy->y = i;
+        enemy->model = wolf;
+        enemy->alive = true;
+    }*/
+}
+
+void EnemyRelease()
+{
+    UnloadModel(wolf);
+}
+
+void EnemyUpdate()
+{
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        if (enemy->alive)
+        {
+            EnemyUpdateOne(enemy);
+        }
+    }
+}
+
+void EnemyUpdateOne(Enemy *enemy)
 {
 
     double now = GetTime();
@@ -95,6 +141,26 @@ void EnemyUpdate(Enemy *enemy)
     }
 }
 
+Enemy *FindClosestEnemy(int tileX, int tileY)
+{
+    Enemy *closestEnemy = 0;
+    float closestDistance = 99999;
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        if (enemy->alive)
+        {
+            int distance = abs(enemy->x - tileX) + abs(enemy->y - tileY);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+    }
+    return closestEnemy;
+}
+
 void EnemyGetTargetDir(Enemy *enemy, int tileX, int tileY, int *dirX, int *dirY)
 {
     int distX = tileX - enemy->x;
@@ -117,7 +183,14 @@ float EnemyGetTargetRotation(int x, int y)
                      : 180;
 }
 
-void EnemyRender(Enemy *enemy)
+void EnemyRender()
 {
-    DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025, 0.025, 0.025}, WHITE);
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        if (enemy->alive)
+        {
+            DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025, 0.025, 0.025}, WHITE);
+        }
+    }
 }

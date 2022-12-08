@@ -18,14 +18,23 @@ struct Enemy
    float rotation;
    float rotationTarget;
    Model model;
+   bool alive;
 } typedef Enemy;
 
 // Public
-void EnemyUpdate(Enemy *enemy);
+void EnemyUpdate();
 
-void EnemyRender(Enemy *enemy);
+void EnemyInit();
+
+void EnemyRelease();
+
+void EnemyRender();
+
+Enemy *FindClosestEnemy(int tileX, int tileY);
 
 // Private
+void EnemyUpdateOne(Enemy *enemy);
+
 void EnemyGetTargetDir(Enemy *enemy, int tileX, int tileY, int *dirX, int *dirY);
 
 float EnemyGetTargetRotation(int x, int y);
