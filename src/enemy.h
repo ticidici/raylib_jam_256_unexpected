@@ -30,7 +30,7 @@ void EnemyRelease();
 
 void EnemyRender();
 
-Enemy *FindClosestEnemy(int tileX, int tileY);
+Enemy *FindClosestEnemy(Vector3 position, float maxDistance);
 
 void EnemySpawn(int tileX, int tileY);
 

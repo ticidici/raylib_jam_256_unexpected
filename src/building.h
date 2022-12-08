@@ -16,6 +16,7 @@ struct Block
     bool isPorquet;
     Model model;
     BuildingMaterial buildingMaterial;
+    double lastAttackTime;
 } typedef Block;
 
 struct Building
@@ -25,10 +26,20 @@ struct Building
     float destroyOffset;
 } typedef Building;
 
-void BuildingUpdate(Building *building);
+struct Bullet
+{
+    Vector3 position;
+    Vector3 target;
+    Model model;
+    bool alive;
+} typedef Bullet;
+
+void BuildingUpdate(Building *building, Vector3 position);
 
 void BuildingRender(Building *building, Vector3 position);
 
 void BuildingDestroyBlock(Building *building);
 
+// Private
+void BuildingSpawnBullet(Vector3 position, Vector3 target);
 #endif
