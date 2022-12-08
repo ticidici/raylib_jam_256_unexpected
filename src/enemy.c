@@ -18,25 +18,10 @@ void EnemyInit()
 {
     wolf = LoadModel("resources/wolf.glb");
 
-    int totalEnemies = 1;
-
-    Enemy *enemy = &enemies[0];
-    *enemy = (Enemy){0};
-    enemy->position = TerrainGetTile(0, 0)->position;
-    enemy->x = 0;
-    enemy->y = 0;
-    enemy->model = wolf;
-    enemy->alive = true;
-    /*for (int i = 0; i < totalEnemies; i++)
-    {
-        Enemy *enemy = &enemies[i];
-        *enemy = (Enemy){0};
-        enemy->position = TerrainGetTile(i, i)->position;
-        enemy->x = i;
-        enemy->y = i;
-        enemy->model = wolf;
-        enemy->alive = true;
-    }*/
+    EnemySpawn(0, 0);
+    EnemySpawn(12, 0);
+    EnemySpawn(0, 12);
+    EnemySpawn(12, 12);
 }
 
 void EnemyRelease()
@@ -160,6 +145,24 @@ Enemy *FindClosestEnemy(int tileX, int tileY)
         }
     }
     return closestEnemy;
+}
+
+void EnemySpawn(int tileX, int tileY)
+{
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        if (!(&enemies[i])->alive)
+        {
+            Enemy enemy = {0};
+            enemy.x = tileX;
+            enemy.y = tileY;
+            enemy.position = TerrainGetTile(tileX, tileY)->position;
+            enemy.alive = true;
+            enemy.model = wolf;
+            enemies[i] = enemy;
+            return;
+        }
+    }
 }
 
 void EnemyGetTargetDir(Enemy *enemy, int tileX, int tileY, int *dirX, int *dirY)

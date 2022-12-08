@@ -32,6 +32,8 @@ void EnemyRender();
 
 Enemy *FindClosestEnemy(int tileX, int tileY);
 
+void EnemySpawn(int tileX, int tileY);
+
 // Private
 void EnemyUpdateOne(Enemy *enemy);
 
