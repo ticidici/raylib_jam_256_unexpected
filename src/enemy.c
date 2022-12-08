@@ -1,6 +1,7 @@
 #include "enemy.h"
 #include "raymath.h"
 #include "terrain.h"
+#include <stdlib.h>
 
 static Vector3 YAW = {0, 1.0f, 0};
 
@@ -9,7 +10,44 @@ static Vector3 YAW = {0, 1.0f, 0};
 #define ENEMY_MOVEMENT_SPEED 10.0f
 #define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 90.0f)
 
-void EnemyUpdate(Enemy *enemy)
+#define ENEMY_COUNT 100
+static Enemy enemies[ENEMY_COUNT];
+static Model wolf;
+
+void EnemyInit()
+{
+    wolf = LoadModel("resources/wolf.glb");
+
+    for (int x = 0; x < BATTLEFIELD_SIZE; x++)
+    {
+        for (int y = 0; y < BATTLEFIELD_SIZE; y++)
+        {
+            if (x == 0 || x == BATTLEFIELD_SIZE - 1 || y == 0 || y == BATTLEFIELD_SIZE - 1)
+            {
+                EnemySpawn(x, y);
+            }
+        }
+    }
+}
+
+void EnemyRelease()
+{
+    UnloadModel(wolf);
+}
+
+void EnemyUpdate()
+{
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        if (enemy->alive)
+        {
+            EnemyUpdateOne(enemy);
+        }
+    }
+}
+
+void EnemyUpdateOne(Enemy *enemy)
 {
 
     double now = GetTime();
@@ -21,27 +59,24 @@ void EnemyUpdate(Enemy *enemy)
     Tile *tileS = TerrainGetTile(enemy->x, enemy->y + 1);
     Tile *tileW = TerrainGetTile(enemy->x - 1, enemy->y);
 
-    Tile *target = (tileN->building.blockCount > 0)   ? tileN
-                   : (tileE->building.blockCount > 0) ? tileE
-                   : (tileS->building.blockCount > 0) ? tileS
-                   : (tileW->building.blockCount > 0) ? tileW
-                                                      : 0;
+    Tile *target = (tileN && tileN->building.blockCount > 0)   ? tileN
+                   : (tileE && tileE->building.blockCount > 0) ? tileE
+                   : (tileS && tileS->building.blockCount > 0) ? tileS
+                   : (tileW && tileW->building.blockCount > 0) ? tileW
+                                                               : 0;
 
     Tile *tile = TerrainGetTile(enemy->x, enemy->y);
 
     // Rotate towards target
-    float rotationDistR = enemy->rotation - enemy->rotationTarget;
-    float rotationDistL = enemy->rotationTarget - enemy->rotation;
-    float rotateSign = fabs(rotationDistL) > fabs(rotationDistR) ? -1 : 1;
-
+    float rotationDiff = enemy->rotationTarget - enemy->rotation;
+    rotationDiff += (rotationDiff > 180)    ? -360
+                    : (rotationDiff < -180) ? 360
+                                            : 0;
     float rotationIncrement = ENEMY_ROTATION_SPEED * delta;
-    if (enemy->rotation < enemy->rotationTarget - rotationIncrement * 1.1f)
+    if (fabs(rotationDiff) > rotationIncrement)
     {
-        enemy->rotation += rotationIncrement;
-    }
-    else if (enemy->rotation > enemy->rotationTarget + rotationIncrement * 1.1f)
-    {
-        enemy->rotation -= rotationIncrement;
+        int sign = rotationDiff > 0 ? 1 : -1;
+        enemy->rotation += rotationIncrement * sign;
     }
     else
     {
@@ -49,12 +84,19 @@ void EnemyUpdate(Enemy *enemy)
     }
 
     float positionIncrement = ENEMY_MOVEMENT_SPEED * delta;
-    if (Vector3Distance(tile->position, enemy->position) > positionIncrement)
+    Vector2 enemyPos = {enemy->position.x, enemy->position.z};
+    Vector2 tilePos = {tile->position.x, tile->position.z};
+    float tileDistance = Vector2Distance(enemyPos, tilePos);
+    if (tileDistance > positionIncrement)
     {
         // Move
-        Vector3 dir = Vector3Normalize(Vector3Subtract(tile->position, enemy->position));
-        Vector3 increment = Vector3Scale(dir, positionIncrement);
-        enemy->position = Vector3Add(enemy->position, increment);
+        Vector2 dir = Vector2Normalize(Vector2Subtract(tilePos, enemyPos));
+        Vector2 increment = Vector2Scale(dir, positionIncrement);
+        enemy->position.x += increment.x;
+        enemy->position.z += increment.y;
+
+        float x = ((TILE_HALF_WIDTH * 2) - tileDistance) / (TILE_HALF_WIDTH * 2);
+        enemy->position.y = (1 - (x * x - x + 1)) * 6.0f;
     }
     else if (target != 0)
     {
@@ -67,7 +109,7 @@ void EnemyUpdate(Enemy *enemy)
         {
             enemy->lastAttackTime = now;
             enemy->lastMoveTime = now;
-            target->building.blockCount--;
+            BuildingDestroyBlock(&target->building);
         }
     }
     else
@@ -82,8 +124,65 @@ void EnemyUpdate(Enemy *enemy)
             EnemyGetTargetDir(enemy, MIDDLE_TILE_INDEX, MIDDLE_TILE_INDEX, &dirX, &dirY);
             enemy->rotationTarget = EnemyGetTargetRotation(dirX, dirY);
 
-            enemy->x += dirX;
-            enemy->y += dirY;
+            int nextX = enemy->x + dirX;
+            int nextY = enemy->y + dirY;
+
+            Tile *nextTile = TerrainGetTile(nextX, nextY);
+            if (nextTile->enemy)
+            {
+                // Tile already has an enemy, wait for his moves
+            }
+            else
+            {
+                tile->enemy = 0;
+                enemy->x = nextX;
+                enemy->y = nextY;
+                nextTile->enemy = enemy;
+            }
+        }
+    }
+}
+
+Enemy *FindClosestEnemy(int tileX, int tileY)
+{
+    Enemy *closestEnemy = 0;
+    float closestDistance = 99999;
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        if (enemy->alive)
+        {
+            int distance = abs(enemy->x - tileX) + abs(enemy->y - tileY);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+    }
+    return closestEnemy;
+}
+
+void EnemySpawn(int tileX, int tileY)
+{
+    Tile *tile = TerrainGetTile(tileX, tileY);
+    if (tile->enemy != 0 || tile->building.blockCount > 0) // Can not spawn on an occupied tile
+    {
+        return;
+    }
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        if (!(&enemies[i])->alive)
+        {
+            Enemy enemy = {0};
+            enemy.x = tileX;
+            enemy.y = tileY;
+            enemy.position = tile->position;
+            enemy.alive = true;
+            enemy.model = wolf;
+            enemies[i] = enemy;
+            tile->enemy = &enemy;
+            return;
         }
     }
 }
@@ -105,12 +204,19 @@ void EnemyGetTargetDir(Enemy *enemy, int tileX, int tileY, int *dirX, int *dirY)
 float EnemyGetTargetRotation(int x, int y)
 {
     return x == 1    ? 90
-           : x == -1 ? -90
+           : x == -1 ? 270
            : y == 1  ? 0
                      : 180;
 }
 
-void EnemyRender(Enemy *enemy)
+void EnemyRender()
 {
-    DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025, 0.025, 0.025}, WHITE);
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Enemy *enemy = &enemies[i];
+        if (enemy->alive)
+        {
+            DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025, 0.025, 0.025}, WHITE);
+        }
+    }
 }

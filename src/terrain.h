@@ -13,6 +13,8 @@
 #define BATTLEFIELD_LAST_TILE_INDEX BATTLEFIELD_SIZE - 1
 #define TILE_HALF_WIDTH 2.0f
 
+struct Enemy typedef Enemy;
+
 enum TileType
 {
     GrassType,
@@ -31,7 +33,7 @@ struct Tile
     Building building;
     int coordX;
     int coordY;
-    // entity occupying?
+    Enemy* enemy;
 } typedef Tile;
 
 
