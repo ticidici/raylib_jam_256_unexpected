@@ -17,8 +17,11 @@ void UiInit(int aScreenWidth, int aScreenHeight);
 void UiUpdate(bool isPaused);
 void UiRender(bool isPaused);
 void UiRelease();
-void ShowTileButtons();
-void HideTileButtons();
+void UiShowTileButtons();
+void UiHideTileButtons();
+
+bool UiIsTileGrassButtonPressed();
+bool UiIsTileLavaButtonPressed();
 
 //private
 void SetRectangleSettings(Rectangle *rectangle, RectangleSettings settings);

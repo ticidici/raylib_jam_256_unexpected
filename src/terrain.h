@@ -50,7 +50,6 @@ int TerrainGetTileCost(TileType tileType);
 void TerrainBuyTile(TileType tileType, Tile* tile);
 bool ShouldShowTileInfo();
 
-
 // Private
 void DrawGridCentered(float tileSpacing, int tileCount);
 void UpdateTileSelector();
