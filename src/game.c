@@ -42,16 +42,15 @@ void Init()
 
     TerrainInit();
 
-    int totalEnemies = 5;
+    int totalEnemies = 1;
     for (int i = 0; i < totalEnemies; i++)
     {
         Enemy *enemy = &enemies[i];
         *enemy = (Enemy){0};
-        enemy->speed = 10;
-        enemy->position = TerrainGetTile(i, 6)->position;
-        enemy->target = TerrainGetTile(FORTRESS_FIRST_TILE_INDEX, i)->position;
+        enemy->position = TerrainGetTile(i, i)->position;
+        enemy->x = i;
+        enemy->y = i;
         enemy->model = wolf;
-        enemy->coldown = 3.0;
         enemiesCount++;
     }
 }
