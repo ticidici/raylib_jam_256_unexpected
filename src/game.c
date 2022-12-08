@@ -47,10 +47,9 @@ void Init()
     {
         Enemy *enemy = &enemies[i];
         *enemy = (Enemy){0};
-        enemy->position = TerrainGetTile(i, 6)->position;
+        enemy->position = TerrainGetTile(i, i)->position;
         enemy->x = i;
         enemy->y = i;
-        enemy->target = TerrainGetTile(FORTRESS_FIRST_TILE_INDEX, i)->position;
         enemy->model = wolf;
         enemiesCount++;
     }

@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+struct Tile typedef Tile;
+
 struct Enemy
 {
    int hp;
@@ -12,10 +14,9 @@ struct Enemy
    int y;
    double lastMoveTime;
    bool lastMoveDirX;
-   float range;
    Vector3 position;
-   float rotation; // degrees of yaw
-   Vector3 target;
+   float rotation;
+   float rotationTarget;
    Model model;
 } typedef Enemy;
 
@@ -23,5 +24,10 @@ struct Enemy
 void EnemyUpdate(Enemy *enemy);
 
 void EnemyRender(Enemy *enemy);
+
+// Private
+void EnemyGetTargetDir(Enemy *enemy, int tileX, int tileY, int *dirX, int *dirY);
+
+float EnemyGetTargetRotation(int x, int y);
 
 #endif
