@@ -4,10 +4,12 @@
 
 static Model tileSelector;
 static Model grassTile;
-static Model grass2Tile;
 static Model lavaTile;
 static Model dirtBrownTile;
 static Model dirtGrayTile;
+static Model wheatTile;
+static Model woodTile;
+static Model clayTile;
 
 static Model red1;
 static Model red2;
@@ -39,8 +41,7 @@ void TerrainInit()
 
     tileSelector = LoadModel("resources/tile_selector.gltf");
 
-    grassTile = LoadModel("resources/grass_tile.gltf");
-    grass2Tile = LoadModel("resources/grass2_tile.gltf");
+    grassTile = LoadModel("resources/grass2_tile.gltf");
     lavaTile = LoadModel("resources/lava_tile.gltf");
     dirtGrayTile = LoadModel("resources/dirtgray_tile.gltf");
     dirtBrownTile = LoadModel("resources/dirtbrown_tile.gltf");
@@ -76,7 +77,7 @@ void TerrainInit()
                     // }
                     else
                     {
-                        battlefieldTiles[i][j].tileModel = grass2Tile;
+                        battlefieldTiles[i][j].tileModel = grassTile;
                         battlefieldTiles[i][j].tileType = GrassType;
                     }
                 }
@@ -118,10 +119,12 @@ void TerrainRelease()
 {
     UnloadModel(tileSelector);
     UnloadModel(grassTile);
-    UnloadModel(grass2Tile);
     UnloadModel(lavaTile);
     UnloadModel(dirtGrayTile);
     UnloadModel(dirtBrownTile);
+    UnloadModel(wheatTile);
+    UnloadModel(woodTile);
+    UnloadModel(clayTile);
     UnloadModel(red1);
     UnloadModel(red2);
     UnloadModel(red3);
@@ -137,22 +140,32 @@ void TerrainUpdate()
         //if clicked on option confirm and deselect (even if it is not executed)
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            //if button
-            TerrainBuyTile(LavaType, tileHovered);
+            //if button is clicked don't deselect
+            if (UiIsTileGrassButtonPressed())
+            {
+                TerrainBuyTile(GrassType, tileHovered);
 
-            if (!IsPointInsideTileInScreenSpace(GetMousePosition(), tileHovered, TILE_HALF_WIDTH))
+            }
+            else if (UiIsTileLavaButtonPressed())
+            {
+                TerrainBuyTile(LavaType, tileHovered);
+            }
+            
+            
+            else if (!IsPointInsideTileInScreenSpace(GetMousePosition(), tileHovered, TILE_HALF_WIDTH))
             {
                 isTileSelected = false;
                 tileJustDeselected = true;
+                UiHideTileButtons();
             }
         }
 
-        //if clicked (outside?) or cancel button, deselect tile
-        if (/*IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ||*/ IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || IsKeyPressed(KEY_ESCAPE))
+        //if right clicked or cancel button, deselect tile
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) || IsKeyPressed(KEY_ESCAPE))
         {
             isTileSelected = false;
             tileJustDeselected = true;
-            HideTileButtons();
+            UiHideTileButtons();
         }
     }
 
@@ -172,7 +185,7 @@ void TerrainUpdate()
             else
             {
                 isTileSelected = true;
-                ShowTileButtons();
+                UiShowTileButtons();
             }
         }
     }
@@ -279,13 +292,26 @@ void TerrainBuyTile(TileType tileType, Tile* tile)
         return;
     }
 
+    tile->tileType = tileType;
     switch (tileType)
     {
+        case GrassType:
+            tile->tileModel = grassTile;
+            break;
         case LavaType:
             tile->tileModel = lavaTile;
             break;
-        case GrassType:
-            tile->tileModel = grassTile;
+    
+        case WheatType:
+            tile->tileModel = wheatTile;
+            break;
+    
+        case WoodType:
+            tile->tileModel = woodTile;
+            break;
+    
+        case ClayType:
+            tile->tileModel = clayTile;
             break;
     }
 }
