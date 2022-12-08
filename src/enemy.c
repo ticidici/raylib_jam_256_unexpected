@@ -68,18 +68,15 @@ void EnemyUpdateOne(Enemy *enemy)
     Tile *tile = TerrainGetTile(enemy->x, enemy->y);
 
     // Rotate towards target
-    float rotationDistR = enemy->rotation - enemy->rotationTarget;
-    float rotationDistL = enemy->rotationTarget - enemy->rotation;
-    float rotateSign = fabs(rotationDistL) > fabs(rotationDistR) ? -1 : 1;
-
+    float rotationDiff = enemy->rotationTarget - enemy->rotation;
+    rotationDiff += (rotationDiff > 180)    ? -360
+                    : (rotationDiff < -180) ? 360
+                                            : 0;
     float rotationIncrement = ENEMY_ROTATION_SPEED * delta;
-    if (enemy->rotation < enemy->rotationTarget - rotationIncrement * 1.1f)
+    if (fabs(rotationDiff) > rotationIncrement)
     {
-        enemy->rotation += rotationIncrement;
-    }
-    else if (enemy->rotation > enemy->rotationTarget + rotationIncrement * 1.1f)
-    {
-        enemy->rotation -= rotationIncrement;
+        int sign = rotationDiff > 0 ? 1 : -1;
+        enemy->rotation += rotationIncrement * sign;
     }
     else
     {
