@@ -2,6 +2,7 @@
 #include "enemy.h"
 #include "terrain.h"
 #include "camera.h"
+#include "building.h"
 #include "uiManager.h"
 
 #include "raymath.h"
@@ -38,6 +39,7 @@ void Init()
 
     TerrainInit();
     EnemyInit();
+    BuildingInit();
 }
 
 void Release()
@@ -50,6 +52,7 @@ void Release()
 
     EnemyRelease();
     TerrainRelease();
+    BuildingRelease();
 
     CloseWindow();
 }

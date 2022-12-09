@@ -3,6 +3,15 @@
 
 #define BLOCK_HEIGHT 2.0f
 
+static Model weaponWeak;
+static Model weaponStrong;
+
+void BuildingInit()
+{
+    weaponWeak = LoadModel("resources/weapon_weak.gltf");
+    weaponStrong = LoadModel("resources/weapon_strong.gltf");
+}
+
 void BuildingUpdate(Building *building)
 {
     building->destroyOffset -= 6 * GetFrameTime();
@@ -21,6 +30,8 @@ void BuildingRender(Building *building, Vector3 position)
         float y = position.y + i * BLOCK_HEIGHT + building->destroyOffset;
         Vector3 blockPosition = {position.x, y, position.z};
         DrawModel(block->model, blockPosition, 1.f, WHITE);
+        if (block->weaponType == WeaponWeak) DrawModel(weaponWeak, blockPosition, 1.f, WHITE);
+        else if (block->weaponType == WeaponStrong) DrawModel(weaponStrong, blockPosition, 1.f, WHITE);
     }
 }
 
@@ -36,4 +47,10 @@ void BuildingDestroyBlock(Building *building)
     }
 
     building->blockCount -= 1;
+}
+
+void BuildingRelease()
+{
+    UnloadModel(weaponWeak);
+    UnloadModel(weaponStrong);
 }

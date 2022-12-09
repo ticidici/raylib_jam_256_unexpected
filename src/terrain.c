@@ -138,8 +138,11 @@ void TerrainInit()
 
     Building* building5 = &battlefieldTiles[8][7].building;
     building5->blocks[0].model = brickCube;
+    building5->blocks[0].weaponType = WeaponWeak;
     building5->blocks[1].model = brickCube;
+    building5->blocks[1].weaponType = WeaponWeak;
     building5->blocks[2].model = brickCube;
+    building5->blocks[2].weaponType = WeaponStrong;
     building5->blockCount = 3;
 
 }

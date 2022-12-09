@@ -10,7 +10,7 @@ static Vector3 YAW = {0, 1.0f, 0};
 #define ENEMY_MOVEMENT_SPEED 10.0f
 #define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 90.0f)
 
-#define ENEMY_COUNT 100
+#define ENEMY_COUNT 1
 static Enemy enemies[ENEMY_COUNT];
 static Model wolf;
 
