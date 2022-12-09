@@ -36,13 +36,13 @@ void BuildingUpdate(Building *building, Vector3 position)
         blockPosition.y += (BLOCK_HEIGHT / 2) * (i + 1);
 
         // Atack
-        if (now - block->lastAttackTime > BLOCK_ATTACK_COLDOWN)
+        if (block->weaponType != WEAPON_NONE && now - block->lastAttackTime > BLOCK_ATTACK_COLDOWN)
         {
             Enemy *targetEnemy = FindClosestEnemy(position, 10);
             if (targetEnemy)
             {
                 block->lastAttackTime = now;
-                BulletSpawn(blockPosition, targetEnemy, BulletSmall);
+                BulletSpawn(blockPosition, targetEnemy, block->weaponType);
             }
         }
     }
