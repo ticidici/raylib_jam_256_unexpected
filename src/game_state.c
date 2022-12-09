@@ -64,12 +64,16 @@ void GameStateUpdate()
 
 	if (runTimePassed - wave.startTime >= wave.duration)
 	{
+		if (wave.number > 0) {
+			PlaySoundMulti(waveSound);
+		}
+
 		// Next wave
 		wave.duration = 20;
+		wave.number += 1;
 		wave.enemiesCount += 2;
 		wave.startTime = runTimePassed;
 
-		PlaySoundMulti(waveSound);
 
 		for (int i = 0; i < wave.enemiesCount; i++)
 		{

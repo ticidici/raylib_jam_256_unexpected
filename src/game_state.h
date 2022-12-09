@@ -7,6 +7,7 @@ enum TileType typedef TileType;
 
 struct EnemyWave
 {
+    int number;
     int enemiesCount;
     float startTime;
     float duration; // Time to next wave in seconds
