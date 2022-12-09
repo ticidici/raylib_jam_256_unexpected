@@ -144,7 +144,7 @@ Enemy *FindClosestEnemy(Vector3 position, float maxDistance)
             Tile *enemyTile = TerrainGetTile(enemy->x, enemy->y);
             Vector3 enemyPosition = enemyTile->position;
             float distance = Vector3Distance(position, enemyPosition);
-            if (distance < closestDistance && distance > maxDistance)
+            if (distance < closestDistance && distance < maxDistance)
             {
                 closestDistance = distance;
                 closestEnemy = enemy;

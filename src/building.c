@@ -72,7 +72,7 @@ void BuildingUpdate(Building *building, Vector3 position)
         // Atack
         if (block->weaponType != WEAPON_NONE && now - block->lastAttackTime > BLOCK_ATTACK_COLDOWN)
         {
-            Enemy *targetEnemy = FindClosestEnemy(position, 10);
+            Enemy *targetEnemy = FindClosestEnemy(position, BATTLEFIELD_SIZE);
             if (targetEnemy)
             {
                 block->lastAttackTime = now;
