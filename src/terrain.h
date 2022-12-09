@@ -12,6 +12,7 @@
 #define FORTRESS_LAST_TILE_INDEX BATTLEFIELD_SIZE - BATTLEFIELD_RING_WIDTH - 1
 #define BATTLEFIELD_LAST_TILE_INDEX BATTLEFIELD_SIZE - 1
 #define TILE_HALF_WIDTH 2.0f
+#define POS_TO_TILE = 1 / (TILE_HALF_WIDTH * 2)
 
 struct Enemy typedef Enemy;
 
@@ -33,9 +34,8 @@ struct Tile
     Building building;
     int coordX;
     int coordY;
-    Enemy* enemy;
+    Enemy *enemy;
 } typedef Tile;
-
 
 // Public
 void TerrainInit();
@@ -49,7 +49,7 @@ void TerrainRender();
 Tile *TerrainGetTileSelected();
 Tile *TerrainGetTile(int x, int y);
 int TerrainGetTileCost(TileType tileType);
-void TerrainBuyTile(TileType tileType, Tile* tile);
+void TerrainBuyTile(TileType tileType, Tile *tile);
 bool ShouldShowTileInfo();
 
 // Private

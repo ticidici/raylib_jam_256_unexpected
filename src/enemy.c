@@ -180,6 +180,7 @@ void EnemySpawn(int tileX, int tileY)
             enemy.x = tileX;
             enemy.y = tileY;
             enemy.position = tile->position;
+            enemy.hp = 4;
             enemy.alive = true;
             enemy.model = wolf;
             enemies[i] = enemy;

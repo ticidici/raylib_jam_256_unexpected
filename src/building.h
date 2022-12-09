@@ -26,13 +26,6 @@ struct Building
     float destroyOffset;
 } typedef Building;
 
-struct Bullet
-{
-    Vector3 position;
-    Vector3 target;
-    Model model;
-    bool alive;
-} typedef Bullet;
 
 void BuildingUpdate(Building *building, Vector3 position);
 
@@ -40,6 +33,4 @@ void BuildingRender(Building *building, Vector3 position);
 
 void BuildingDestroyBlock(Building *building);
 
-// Private
-void BuildingSpawnBullet(Vector3 position, Vector3 target);
 #endif
