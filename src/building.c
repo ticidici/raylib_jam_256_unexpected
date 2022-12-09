@@ -4,6 +4,7 @@
 #include "bullet.h"
 #include "game_state.h"
 #include "sound.h"
+#include "terrain.h"
 
 #define BLOCK_HEIGHT 2.0f
 #define BLOCK_FALL_SPEED 6.0f
@@ -126,7 +127,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
     {
         if(GetResource(WheatType) < cubeStrawWheatNeeded)
         {
-            PlaySound(SoundWrong);
+            EmitSound(SoundWrong);
             return;
         }
 
@@ -139,7 +140,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
     {
         if (GetResource(WoodType) < cubeStickWoodNeeded)
         {
-            PlaySound(SoundWrong);
+            EmitSound(SoundWrong);
             return;
         }
 
@@ -152,7 +153,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
     {
         if (GetResource(ClayType) < cubeBrickClayNeeded)
         {
-            PlaySound(SoundWrong);
+            EmitSound(SoundWrong);
             return;
         }
 
@@ -174,7 +175,7 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
     {
         if (GetMoney() < weaponWeakPrice)
         {
-            PlaySound(SoundWrong);
+            EmitSound(SoundWrong);
             return;
         }
 
@@ -185,7 +186,7 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
     {
         if (GetResource(LavaType) < weaponStrongIronNeeded || GetMoney() < weaponStrongPrice)
         {
-            PlaySound(SoundWrong);
+            EmitSound(SoundWrong);
             return;
         }
         
