@@ -24,6 +24,7 @@ struct Block
     Model model;
     BuildingMaterial buildingMaterial;
     WeaponType weaponType;
+    double lastAttackTime;
 } typedef Block;
 
 struct Building
@@ -36,7 +37,7 @@ struct Building
 
 void BuildingInit();
 
-void BuildingUpdate(Building *building);
+void BuildingUpdate(Building *building, Vector3 position);
 
 void BuildingRender(Building *building, Vector3 position);
 

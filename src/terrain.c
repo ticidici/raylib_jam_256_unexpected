@@ -243,7 +243,7 @@ void TerrainUpdate()
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             Tile *tile = &battlefieldTiles[i][j];
-            BuildingUpdate(&tile->building);
+            BuildingUpdate(&tile->building, tile->position);
         }
     }
 

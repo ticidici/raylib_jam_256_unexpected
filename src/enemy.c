@@ -143,7 +143,7 @@ void EnemyUpdateOne(Enemy *enemy)
     }
 }
 
-Enemy *FindClosestEnemy(int tileX, int tileY)
+Enemy *FindClosestEnemy(Vector3 position, float maxDistance)
 {
     Enemy *closestEnemy = 0;
     float closestDistance = 99999;
@@ -152,8 +152,10 @@ Enemy *FindClosestEnemy(int tileX, int tileY)
         Enemy *enemy = &enemies[i];
         if (enemy->alive)
         {
-            int distance = abs(enemy->x - tileX) + abs(enemy->y - tileY);
-            if (distance < closestDistance)
+            Tile *enemyTile = TerrainGetTile(enemy->x, enemy->y);
+            Vector3 enemyPosition = enemyTile->position;
+            float distance = Vector3Distance(position, enemyPosition);
+            if (distance < closestDistance && distance > maxDistance)
             {
                 closestDistance = distance;
                 closestEnemy = enemy;
@@ -178,6 +180,7 @@ void EnemySpawn(int tileX, int tileY)
             enemy.x = tileX;
             enemy.y = tileY;
             enemy.position = tile->position;
+            enemy.hp = 4;
             enemy.alive = true;
             enemy.model = wolf;
             enemies[i] = enemy;
