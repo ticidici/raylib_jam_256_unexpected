@@ -66,7 +66,7 @@ void BulletRender()
     }
 }
 
-void BulletSpawn(Vector3 position, Enemy *target, BulletType type)
+void BulletSpawn(Vector3 position, Enemy *target, WeaponType type)
 {
     for (int i = 0; i < BULLET_COUNT; i++)
     {
@@ -78,11 +78,11 @@ void BulletSpawn(Vector3 position, Enemy *target, BulletType type)
             bullet->alive = true;
             bullet->position = position;
             bullet->direction = Vector3Normalize(Vector3Subtract(tile->position, position));
-            bullet->speed = type == BulletSmall ? 60.0f : 40.0f;
-            bullet->damage = type == BulletSmall ? 5 : 2;
+            bullet->speed = type == WeaponWeak ? 60.0f : 40.0f;
+            bullet->damage = type == WeaponWeak ? 5 : 2;
             bullet->targetX = tile->coordX;
             bullet->targetY = tile->coordY;
-            bullet->model = type == BulletSmall ? smallBullet : bigBullet;
+            bullet->model = type == WeaponWeak ? smallBullet : bigBullet;
             return;
         }
     }

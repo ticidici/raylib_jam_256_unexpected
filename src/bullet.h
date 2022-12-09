@@ -6,11 +6,7 @@
 
 struct Enemy typedef Enemy;
 
-enum BulletType
-{
-    BulletSmall,
-    BulletBig
-} typedef BulletType;
+enum WeaponType typedef WeaponType;
 
 struct Bullet
 {
@@ -32,6 +28,6 @@ void BulletUpdate();
 
 void BulletRender();
 
-void BulletSpawn(Vector3 position, Enemy *target, BulletType type);
+void BulletSpawn(Vector3 position, Enemy *target, WeaponType type);
 
 #endif
