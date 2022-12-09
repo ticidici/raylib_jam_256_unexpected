@@ -156,6 +156,7 @@ void TerrainInit()
     building2->blocks[0].buildingMaterial = Stick;
     building2->blockCount = 1;
     Building *building3 = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
+    building3->isPorquet = true;
     building3->blocks[0].buildingMaterial = Straw;
     building3->blocks[1].buildingMaterial = Brick;
     building3->blocks[2].buildingMaterial = Stick;
@@ -199,7 +200,7 @@ void TerrainUpdate()
         //if clicked on option confirm and deselect (even if it is not executed)
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            //if button is clicked don't deselectç
+            //if button is clicked don't deselect
             //tile
             if (UiIsTileGrassButtonPressed())
             {
@@ -258,6 +259,10 @@ void TerrainUpdate()
                 tileJustDeselected = true;
                 UiHideTileButtons();
             }
+            else
+            {
+                showHoveredTileInfo = !showHoveredTileInfo;
+            }
         }
 
         //if right clicked or cancel button, deselect tile
@@ -303,7 +308,7 @@ void TerrainUpdate()
         }
     }
 
-    if (IsKeyPressed(KEY_I) && !isTileSelected)
+    if (IsKeyPressed(KEY_I) /*&& !isTileSelected*/)
     {
         showHoveredTileInfo = !showHoveredTileInfo;
     }
@@ -374,7 +379,7 @@ void UpdateTileSelector()
 
 bool ShouldShowTileInfo()
 {
-    if (isTileSelected) return true;
+    //if (isTileSelected) return true;
     return showHoveredTileInfo;
 }
 

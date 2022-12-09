@@ -26,7 +26,6 @@ enum WeaponType
 struct Block
 {
     int hp;
-    bool isPorquet;
     BuildingMaterial buildingMaterial;
     WeaponType weaponType;
     double lastAttackTime;
@@ -37,6 +36,7 @@ struct Building
 {
     Block blocks[3];
     int blockCount;
+    bool isPorquet;
 } typedef Building;
 
 void BuildingInit();

@@ -37,7 +37,17 @@ static Texture thunderboltIcon;//also changes the cursor
 
 static Rectangle tileButtonsContainer;
 static RectangleSettings tileButtonsContainerSettings;
-static int containerMargin = 2;
+
+static Rectangle weaponsFloorContainer;
+static RectangleSettings weaponsFloorContainerSettings;
+
+static Rectangle thunderboltContainer;
+static RectangleSettings thunderboltContainerSettings;
+
+static Rectangle sellCubeButtonContainer;
+static RectangleSettings sellCubeButtonContainerSettings;
+static Rectangle sellCubeFloorContainer;
+static RectangleSettings sellCubeFloorContainerSettings;
 
 //------- Buttons -------
 //buy tile
@@ -161,8 +171,8 @@ void UiInit(int aScreenWidth, int aScreenHeight)
 
     //BUTTON SETTINGS
     //right side container
-    Vector2 containerTopLeft = { 232, 256 - 214 };
-    Vector2 containerBottomRight = { (float)(screenWidth), (float)(screenHeight) };
+    Vector2 containerTopLeft = { 232, 256 - 212 };
+    Vector2 containerBottomRight = { 256, 256 };
     Vector2 containerDimensions = GetWidthAndHeightFromCorners(containerTopLeft, containerBottomRight);
     tileButtonsContainerSettings.topLeftCorner = containerTopLeft;
     tileButtonsContainerSettings.width = containerDimensions.x;
@@ -170,6 +180,35 @@ void UiInit(int aScreenWidth, int aScreenHeight)
     tileButtonsContainerSettings.color = BEIGE;
     tileButtonsContainerSettings.isEnabled = false;
     SetRectangleSettings(&tileButtonsContainer, tileButtonsContainerSettings);
+
+    weaponsFloorContainerSettings.topLeftCorner = (Vector2) { containerTopLeft.x - 26 , 256 - 190 - 32 };
+    weaponsFloorContainerSettings.width = 24;
+    weaponsFloorContainerSettings.height = 64;
+    weaponsFloorContainerSettings.color = BEIGE;
+    weaponsFloorContainerSettings.isEnabled = false;
+    SetRectangleSettings(&weaponsFloorContainer, weaponsFloorContainerSettings);
+
+    sellCubeButtonContainerSettings.topLeftCorner = (Vector2){ containerTopLeft.x - 32 - 10 - 2, 256 - 20 };
+    sellCubeButtonContainerSettings.width = 24;
+    sellCubeButtonContainerSettings.height = 24;
+    sellCubeButtonContainerSettings.color = BEIGE;
+    sellCubeButtonContainerSettings.isEnabled = false;
+    SetRectangleSettings(&sellCubeButtonContainer, sellCubeButtonContainerSettings);
+    
+    sellCubeFloorContainerSettings.topLeftCorner = (Vector2){ containerTopLeft.x - 64 - 2, 256 - 46 };
+    sellCubeFloorContainerSettings.width = 64;
+    sellCubeFloorContainerSettings.height = 24;
+    sellCubeFloorContainerSettings.color = BEIGE;
+    sellCubeFloorContainerSettings.isEnabled = false;
+    SetRectangleSettings(&sellCubeFloorContainer, sellCubeFloorContainerSettings);
+    
+    thunderboltContainerSettings.topLeftCorner = (Vector2){ 0, 26 };
+    thunderboltContainerSettings.width = 24;
+    thunderboltContainerSettings.height = 24;
+    thunderboltContainerSettings.color = BEIGE;
+    thunderboltContainerSettings.isEnabled = true;
+    SetRectangleSettings(&thunderboltContainer, thunderboltContainerSettings);
+
 
     //----------- buttons right side -----------
     //weapon icons
@@ -241,7 +280,7 @@ void UiInit(int aScreenWidth, int aScreenHeight)
     lavaButtonSettings.topLeftCorner = (Vector2){ containerTopLeft.x + 2, 256 - 20};
     lavaButtonSettings.width = 20.0f;
     lavaButtonSettings.height = 20.0f;
-    lavaButtonSettings.color = ORANGE;
+    lavaButtonSettings.color = RED;
     lavaButtonSettings.isEnabled = false;
     SetRectangleSettings(&lavaButton, lavaButtonSettings);
     //----------- /buttons right side -----------
@@ -382,7 +421,7 @@ void UiRender()
             else if (tileSelected->tileType == LavaType)
             {
                 tileTypeString = "lava";
-                tileColor = RED;
+                tileColor = lavaButtonSettings.color;
             }
             else if (tileSelected->tileType == DirtType)
             {
@@ -543,7 +582,7 @@ void UiRender()
     }
 
     //----------- buttons right side -----------
-    //container
+    //containers
     if (tileButtonsContainerSettings.isEnabled)
     {
         DrawRectangle(tileButtonsContainerSettings.topLeftCorner.x,
@@ -551,6 +590,42 @@ void UiRender()
             tileButtonsContainerSettings.width,
             tileButtonsContainerSettings.height,
             Fade(tileButtonsContainerSettings.color, 0.8f));
+    }
+
+    if (weaponsFloorContainerSettings.isEnabled)
+    {
+        DrawRectangle(weaponsFloorContainerSettings.topLeftCorner.x,
+            weaponsFloorContainerSettings.topLeftCorner.y,
+            weaponsFloorContainerSettings.width,
+            weaponsFloorContainerSettings.height,
+            Fade(weaponsFloorContainerSettings.color, 0.8f));
+    }
+    
+    if (sellCubeButtonContainerSettings.isEnabled)
+    {
+        DrawRectangle(sellCubeButtonContainerSettings.topLeftCorner.x,
+            sellCubeButtonContainerSettings.topLeftCorner.y,
+            sellCubeButtonContainerSettings.width,
+            sellCubeButtonContainerSettings.height,
+            Fade(sellCubeButtonContainerSettings.color, 0.8f));
+    }
+    
+    if (sellCubeFloorContainerSettings.isEnabled)
+    {
+        DrawRectangle(sellCubeFloorContainerSettings.topLeftCorner.x,
+            sellCubeFloorContainerSettings.topLeftCorner.y,
+            sellCubeFloorContainerSettings.width,
+            sellCubeFloorContainerSettings.height,
+            Fade(sellCubeFloorContainerSettings.color, 0.8f));
+    }
+    
+    if (thunderboltContainerSettings.isEnabled)
+    {
+        DrawRectangle(thunderboltContainerSettings.topLeftCorner.x,
+            thunderboltContainerSettings.topLeftCorner.y,
+            thunderboltContainerSettings.width,
+            thunderboltContainerSettings.height,
+            Fade(thunderboltContainerSettings.color, 0.8f));
     }
     
     //buy weapons
@@ -682,9 +757,22 @@ void UiRender()
     else ShowCursor();
 }
 
+void UiShowThunderbolt()
+{
+    thunderboltContainerSettings.isEnabled = true;
+}
+
+void UiHideThunderbolt()
+{
+    thunderboltContainerSettings.isEnabled = false;
+}
+
 void UiShowTileButtons()
 {
     tileButtonsContainerSettings.isEnabled = true;
+    weaponsFloorContainerSettings.isEnabled = true;
+    sellCubeButtonContainerSettings.isEnabled = true;
+    sellCubeFloorContainerSettings.isEnabled = true;
 
     weaponWeakButtonSettings.isEnabled = true;
     /*if (IsLavaUnlocked()) */weaponStrongButtonSettings.isEnabled = true;
@@ -703,6 +791,9 @@ void UiShowTileButtons()
 void UiHideTileButtons()
 {
     tileButtonsContainerSettings.isEnabled = false;
+    weaponsFloorContainerSettings.isEnabled = false;
+    sellCubeButtonContainerSettings.isEnabled = false;
+    sellCubeFloorContainerSettings.isEnabled = false;
 
     weaponWeakButtonSettings.isEnabled = false;
     weaponStrongButtonSettings.isEnabled = false;

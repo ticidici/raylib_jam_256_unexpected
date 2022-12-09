@@ -14,13 +14,9 @@ static const int screenHeight = 256;
 
 static RenderTexture2D target = {0}; // Initialized at init
 
-static Model pig;
-
 static Texture2D backgroundTexture;
 
 static Vector3 YAW = {0, 1.0f, 0};
-
-static float pigScale = 0.025f;
 
 void Init()
 {
@@ -34,10 +30,6 @@ void Init()
 
     UiInit(screenWidth, screenHeight);
 
-    pig = LoadModel("resources/pig.glb");
-
-    backgroundTexture = LoadTexture("resources/background.png");
-
     TerrainInit();
     BuildingInit();
     EnemyInit();
@@ -49,8 +41,6 @@ void Release()
     UnloadRenderTexture(target);
 
     UnloadTexture(backgroundTexture);
-
-    UnloadModel(pig);
 
     EnemyRelease();
     TerrainRelease();

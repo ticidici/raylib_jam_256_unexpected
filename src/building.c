@@ -9,6 +9,9 @@
 #define BLOCK_FALL_SPEED 6.0f
 #define BLOCK_ATTACK_COLDOWN 1.0f
 
+static Model pig;
+static float pigScale = 0.020f;
+
 static Model strawCube;
 static Model stickCube;
 static Model brickCube;
@@ -37,6 +40,8 @@ static int sellBrickCubePrice = 13;
 
 void BuildingInit()
 {
+    pig = LoadModel("resources/pig.glb");
+
     strawCube = LoadModel("resources/straw_cube.gltf");
     stickCube = LoadModel("resources/stick_cube.gltf");
     brickCube = LoadModel("resources/brick_cube.gltf");
@@ -78,7 +83,8 @@ void BuildingUpdate(Building *building, Vector3 position)
 
 void BuildingRender(Building *building, Vector3 position)
 {
-    for (int i = 0; i < building->blockCount; i++)
+    int blockCount = building->blockCount;
+    for (int i = 0; i < blockCount; i++)
     {
         Block *block = &building->blocks[i];
         // TODO: Add rotation for 360 no scope
@@ -99,9 +105,25 @@ void BuildingRender(Building *building, Vector3 position)
         }
 
         if (block->weaponType == WeaponWeak)
+        {
             DrawModel(weaponWeak, blockPosition, 1.f, weaponWeakColor);
+        }
         else if (block->weaponType == WeaponStrong)
+        {
             DrawModel(weaponStrong, blockPosition, 1.f, weaponStrongColor);
+        }
+
+    }
+
+    if (building->isPorquet)
+    {
+        Vector3 pigPosition = position;
+        if (blockCount > 0)
+        {
+            Block* block = &building->blocks[blockCount - 1];
+            pigPosition.y += blockCount * BLOCK_HEIGHT + block->destroyOffset;
+        }
+        DrawModel(pig, pigPosition, pigScale, WHITE);
     }
 }
 
@@ -198,6 +220,8 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
 
 void BuildingRelease()
 {
+    UnloadModel(pig);
+
     UnloadModel(strawCube);
     UnloadModel(stickCube);
     UnloadModel(brickCube);
