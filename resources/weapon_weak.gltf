@@ -26,7 +26,7 @@
     "materials" : [
         {
             "doubleSided" : true,
-            "name" : "Material",
+            "name" : "WeaponWeak",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0
@@ -72,12 +72,12 @@
             "max" : [
                 0.4000000059604645,
                 1.399999976158142,
-                1.7992587089538574
+                1.5082919597625732
             ],
             "min" : [
                 -0.4000000059604645,
                 0.5999999642372131,
-                0.7992585897445679
+                0.5082919001579285
             ],
             "type" : "VEC3"
         },

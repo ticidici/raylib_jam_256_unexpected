@@ -6,6 +6,9 @@
 static Model weaponWeak;
 static Model weaponStrong;
 
+Color weaponWeakColor = { 240, 223, 194, 255 };
+Color weaponStrongColor = { 169, 232, 227, 255 };
+
 void BuildingInit()
 {
     weaponWeak = LoadModel("resources/weapon_weak.gltf");
@@ -30,8 +33,8 @@ void BuildingRender(Building *building, Vector3 position)
         float y = position.y + i * BLOCK_HEIGHT + building->destroyOffset;
         Vector3 blockPosition = {position.x, y, position.z};
         DrawModel(block->model, blockPosition, 1.f, WHITE);
-        if (block->weaponType == WeaponWeak) DrawModel(weaponWeak, blockPosition, 1.f, WHITE);
-        else if (block->weaponType == WeaponStrong) DrawModel(weaponStrong, blockPosition, 1.f, WHITE);
+        if (block->weaponType == WeaponWeak) DrawModel(weaponWeak, blockPosition, 1.f, weaponWeakColor);
+        else if (block->weaponType == WeaponStrong) DrawModel(weaponStrong, blockPosition, 1.f, weaponStrongColor);
     }
 }
 
