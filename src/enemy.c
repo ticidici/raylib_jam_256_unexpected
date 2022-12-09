@@ -109,7 +109,7 @@ void EnemyUpdateOne(Enemy *enemy)
         {
             enemy->lastAttackTime = now;
             enemy->lastMoveTime = now;
-            BuildingDestroyBlock(&target->building);
+            BuildingDestroyBlock(&target->building, 0);
         }
     }
     else

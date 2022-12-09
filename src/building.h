@@ -29,14 +29,13 @@ struct Block
     BuildingMaterial buildingMaterial;
     WeaponType weaponType;
     double lastAttackTime;
+    float destroyOffset;
 } typedef Block;
 
 struct Building
 {
     Block blocks[3];
     int blockCount;
-    float destroyOffset;
-
 } typedef Building;
 
 void BuildingInit();
@@ -45,7 +44,7 @@ void BuildingUpdate(Building *building, Vector3 position);
 
 void BuildingRender(Building *building, Vector3 position);
 
-void BuildingDestroyBlock(Building *building);
+void BuildingDestroyBlock(Building *building, int blockPosition);
 
 void BuildingRelease();
 

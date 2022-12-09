@@ -10,8 +10,8 @@
 static Model weaponWeak;
 static Model weaponStrong;
 
-static Color weaponWeakColor = { 240, 223, 194, 255 };
-static Color weaponStrongColor = { 169, 232, 227, 255 };
+static Color weaponWeakColor = {240, 223, 194, 255};
+static Color weaponStrongColor = {169, 232, 227, 255};
 
 static int weakWeaponPrice = 5;
 static int strongWeaponPrice = 15;
@@ -29,7 +29,6 @@ static int sellStrawCubePrice = 3;
 static int sellStickCubePrice = 7;
 static int sellBrickCubePrice = 13;
 
-
 void BuildingInit()
 {
     weaponWeak = LoadModel("resources/weapon_weak.gltf");
@@ -39,18 +38,20 @@ void BuildingInit()
 void BuildingUpdate(Building *building, Vector3 position)
 {
     float delta = GetFrameTime();
-    building->destroyOffset -= BLOCK_FALL_SPEED * delta;
-    if (building->destroyOffset < 0)
-    {
-        building->destroyOffset = 0;
-    }
 
     double now = GetTime();
     for (int i = 0; i < building->blockCount; i++)
     {
         Block *block = &building->blocks[i];
         Vector3 blockPosition = position;
-        blockPosition.y += (BLOCK_HEIGHT / 2) * (i + 1);
+
+        block->destroyOffset -= BLOCK_FALL_SPEED * delta;
+        if (block->destroyOffset < 0)
+        {
+            block->destroyOffset = 0;
+        }
+
+        blockPosition.y += (BLOCK_HEIGHT / 2) * (i + 1) + block->destroyOffset;
 
         // Atack
         if (block->weaponType != WEAPON_NONE && now - block->lastAttackTime > BLOCK_ATTACK_COLDOWN)
@@ -71,7 +72,7 @@ void BuildingRender(Building *building, Vector3 position)
     {
         Block *block = &building->blocks[i];
         // TODO: Add rotation for 360 no scope
-        float y = position.y + i * BLOCK_HEIGHT + building->destroyOffset;
+        float y = position.y + i * BLOCK_HEIGHT + block->destroyOffset;
         Vector3 blockPosition = {position.x, y, position.z};
         DrawModel(block->model, blockPosition, 1.f, WHITE);
         if (block->weaponType == WeaponWeak)
@@ -81,15 +82,15 @@ void BuildingRender(Building *building, Vector3 position)
     }
 }
 
-void BuildingDestroyBlock(Building *building)
+void BuildingDestroyBlock(Building *building, int blockPosition)
 {
-    if (building->blockCount == 0)
+    if (blockPosition - 1 > building->blockCount)
         return;
 
-    building->destroyOffset = BLOCK_HEIGHT;
-    for (int i = 1; i < building->blockCount; i++)
+    for (int i = blockPosition + 1; i < building->blockCount; i++)
     {
         building->blocks[i - 1] = building->blocks[i];
+        building->blocks[i - 1].destroyOffset = BLOCK_HEIGHT;
     }
 
     building->blockCount -= 1;
