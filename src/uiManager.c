@@ -651,6 +651,12 @@ void UiRender()
 
     //----------- /buttons right side -----------
 
+    // Timer
+    int timeInSeconds = floorf(GetRunTime());
+    int seconds = timeInSeconds % 60;
+    int minutes = floorf(timeInSeconds / 60);
+    DrawText(TextFormat("%02i:%02i", minutes, seconds), 107, 238, 18, RAYWHITE);
+
 
     // Pause overlay
     if (isPaused)
@@ -681,7 +687,7 @@ void UiShowTileButtons()
     tileButtonsContainerSettings.isEnabled = true;
 
     weaponWeakButtonSettings.isEnabled = true;
-    weaponStrongButtonSettings.isEnabled = true;
+    /*if (IsLavaUnlocked()) */weaponStrongButtonSettings.isEnabled = true;
 
     cubeStrawButtonSettings.isEnabled = true;
     cubeStickButtonSettings.isEnabled = true;
@@ -691,7 +697,7 @@ void UiShowTileButtons()
     wheatButtonSettings.isEnabled = true;
     woodButtonSettings.isEnabled = true;
     clayButtonSettings.isEnabled = true;
-    if (IsLavaUnlocked()) lavaButtonSettings.isEnabled = true;
+    /*if (IsLavaUnlocked()) */lavaButtonSettings.isEnabled = true;
 }
 
 void UiHideTileButtons()

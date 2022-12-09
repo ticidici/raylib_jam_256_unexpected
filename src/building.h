@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+struct Tile typedef Tile;
+
 #define STRAW_CUBE_HP 100
 #define STICK_CUBE_HP 250
 #define BRICK_CUBE_HP 500
@@ -25,7 +27,6 @@ struct Block
 {
     int hp;
     bool isPorquet;
-    Model model;
     BuildingMaterial buildingMaterial;
     WeaponType weaponType;
     double lastAttackTime;
@@ -47,5 +48,8 @@ void BuildingRender(Building *building, Vector3 position);
 void BuildingDestroyBlock(Building *building, int blockPosition);
 
 void BuildingRelease();
+
+void BuildingBuyCube(BuildingMaterial materialType, Tile *tile);
+void BuildingBuyWeapon(WeaponType weaponType, Tile *tile, int cubeIndex);
 
 #endif

@@ -47,7 +47,6 @@ void TerrainRender();
 
 Tile *TerrainGetTileSelected();
 Tile *TerrainGetTile(int x, int y);
-int TerrainGetTileCost(TileType tileType);
 void TerrainBuyTile(TileType tileType, Tile *tile);
 bool ShouldShowTileInfo();
 

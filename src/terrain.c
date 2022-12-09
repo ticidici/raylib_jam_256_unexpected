@@ -1,6 +1,7 @@
 #include "terrain.h"
 #include "utils.h"
 #include "uiManager.h"
+#include "game_state.h"
 
 static Model tileSelector;
 static Model grassTile;
@@ -11,10 +12,6 @@ static Model dirtGrayTile;
 static Model wheatTile;
 static Model woodTile;
 static Model clayTile;
-
-static Model strawCube;
-static Model stickCube;
-static Model brickCube;
 
 static bool isGridShown = false;
 
@@ -91,10 +88,6 @@ void TerrainInit()
     dirtGrayTile = LoadModel("resources/dirtgray_tile.gltf");
     dirtBrownTile = LoadModel("resources/dirtbrown_tile.gltf");
 
-    strawCube = LoadModel("resources/straw_cube.gltf");
-    stickCube = LoadModel("resources/stick_cube.gltf");
-    brickCube = LoadModel("resources/brick_cube.gltf");
-
     tileHovered = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX];
 
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
@@ -156,38 +149,28 @@ void TerrainInit()
     }
 
     Building *building = &battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].building;
-    building->blocks[0].model = strawCube;
     building->blocks[0].buildingMaterial = Straw;
     building->blockCount = 1;
 
     Building *building2 = &battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].building;
-    building2->blocks[0].model = stickCube;
     building2->blocks[0].buildingMaterial = Stick;
     building2->blockCount = 1;
     Building *building3 = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
-    building3->blocks[0].model = strawCube;
     building3->blocks[0].buildingMaterial = Straw;
-    building3->blocks[1].model = brickCube;
     building3->blocks[1].buildingMaterial = Brick;
-    building3->blocks[2].model = stickCube;
     building3->blocks[2].buildingMaterial = Stick;
     building3->blockCount = 3;
 
     Building* building4 = &battlefieldTiles[7][6].building;
-    building4->blocks[0].model = stickCube;
     building4->blocks[2].buildingMaterial = Stick;
-    building4->blocks[1].model = brickCube;
     building4->blocks[2].buildingMaterial = Brick;
     building4->blockCount = 2;
 
     Building* building5 = &battlefieldTiles[8][7].building;
-    building5->blocks[0].model = brickCube;
     building5->blocks[0].buildingMaterial = Brick;
     building5->blocks[0].weaponType = WeaponWeak;
-    building5->blocks[1].model = brickCube;
     building5->blocks[1].buildingMaterial = Brick;
     building5->blocks[1].weaponType = WeaponWeak;
-    building5->blocks[2].model = brickCube;
     building5->blocks[2].buildingMaterial = Brick;
     building5->blocks[2].weaponType = WeaponStrong;
     building5->blockCount = 3;
@@ -205,9 +188,6 @@ void TerrainRelease()
     UnloadModel(wheatTile);
     UnloadModel(woodTile);
     UnloadModel(clayTile);
-    UnloadModel(strawCube);
-    UnloadModel(stickCube);
-    UnloadModel(brickCube);
 }
 
 void TerrainUpdate()
@@ -219,7 +199,8 @@ void TerrainUpdate()
         //if clicked on option confirm and deselect (even if it is not executed)
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            //if button is clicked don't deselect
+            //if button is clicked don't deselectç
+            //tile
             if (UiIsTileGrassButtonPressed())
             {
                 TerrainBuyTile(GrassType, tileHovered);
@@ -241,8 +222,36 @@ void TerrainUpdate()
             {
                 TerrainBuyTile(LavaType, tileHovered);
             }
-            
-            
+            //cube
+            else if (UiIsCubeStrawButtonPressed())
+            {
+                BuildingBuyCube(Straw, tileHovered);
+            }
+            else if (UiIsCubeStickButtonPressed())
+            {
+                BuildingBuyCube(Stick, tileHovered);
+            }
+            else if (UiIsCubeBrickButtonPressed())
+            {
+                BuildingBuyCube(Brick, tileHovered);
+            }
+            //weapon
+            else if (UiIsWeaponWeakButtonPressed())
+            {
+                if (tileHovered->building.blockCount > 0)
+                {
+                    //BuildingBuyWeapon(WeaponWeak, tileHovered);
+                }
+            }
+            else if (UiIsWeaponStrongButtonPressed())
+            {
+                if (tileHovered->building.blockCount > 0)
+                {
+                    //BuildingBuyWeapon(WeaponStrong, tileHovered);
+                }
+            }
+
+            //outside tile buttons
             else if (!IsPointInsideTileInScreenSpace(GetMousePosition(), tileHovered, TILE_HALF_WIDTH))
             {
                 isTileSelected = false;
@@ -369,12 +378,7 @@ bool ShouldShowTileInfo()
     return showHoveredTileInfo;
 }
 
-int TerrainGetTileCost(TileType tileType)
-{
-    //TODO
-}
-
-void TerrainBuyTile(TileType tileType, Tile* tile)
+void TerrainBuyTile(TileType tileType, Tile *tile)
 {
     if (tileType == tile->tileType) return;
 
@@ -385,27 +389,43 @@ void TerrainBuyTile(TileType tileType, Tile* tile)
         return;
     }
 
-    tile->tileType = tileType;
     switch (tileType)
     {
         case GrassType:
+            if (GetMoney() < grassPrice) return;
+            ModifyMoney(-grassPrice);
+
             if(GetRandomValue(0, 100) < 50) tile->tileModel = grassTile;
             else tile->tileModel = grassAltTile;
             break;
+
         case LavaType:
+            if (GetMoney() < lavaPrice) return;
+            ModifyMoney(-lavaPrice);
+
             tile->tileModel = lavaTile;
             break;
     
         case WheatType:
+            if (GetMoney() < wheatPrice) return;
+            ModifyMoney(-wheatPrice);
+
             tile->tileModel = wheatTile;
             break;
     
         case WoodType:
+            if (GetMoney() < woodPrice) return;
+            ModifyMoney(-woodPrice);
+
             tile->tileModel = woodTile;
             break;
     
         case ClayType:
+            if (GetMoney() < clayPrice) return;
+            ModifyMoney(-clayPrice);
+
             tile->tileModel = clayTile;
             break;
     }
+    tile->tileType = tileType;
 }
