@@ -13,8 +13,8 @@ static Model bigBullet;
 
 void BulletInit()
 {
-    smallBullet = LoadModelFromMesh(GenMeshSphere(0.2f, 6, 6));
-    bigBullet = LoadModelFromMesh(GenMeshSphere(0.3f, 6, 6));
+    smallBullet = LoadModelFromMesh(GenMeshSphere(0.4f, 6, 6));
+    bigBullet = LoadModelFromMesh(GenMeshSphere(0.6f, 6, 6));
 }
 
 void BulletRelease()
@@ -62,7 +62,7 @@ void BulletRender()
         Bullet *bullet = &bullets[i];
         if (bullet->alive)
         {
-            DrawModel(bullet->model, bullet->position, 1.f, WHITE);
+            DrawModel(bullet->model, bullet->position, 1.f, bullet->tint);
         }
     }
 }
@@ -80,10 +80,11 @@ void BulletSpawn(Vector3 position, Enemy *target, WeaponType type)
             bullet->position = position;
             bullet->direction = Vector3Normalize(Vector3Subtract(tile->position, position));
             bullet->speed = type == WeaponWeak ? 60.0f : 40.0f;
-            bullet->damage = type == WeaponWeak ? 5 : 2;
+            bullet->damage = type == WeaponWeak ? 1 : 2;
             bullet->targetX = tile->coordX;
             bullet->targetY = tile->coordY;
             bullet->model = type == WeaponWeak ? smallBullet : bigBullet;
+            bullet->tint = type == WeaponWeak ? MAROON : GOLD;
             return;
         }
     }

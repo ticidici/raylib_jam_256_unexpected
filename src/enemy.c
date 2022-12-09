@@ -5,10 +5,10 @@
 
 static Vector3 YAW = {0, 1.0f, 0};
 
-#define ENEMY_ATTACK_COLDOWN 1
-#define ENEMY_MOVEMENT_COLDOWN 1
-#define ENEMY_MOVEMENT_SPEED 10.0f
-#define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 90.0f)
+#define ENEMY_ATTACK_COLDOWN 2
+#define ENEMY_MOVEMENT_COLDOWN 2
+#define ENEMY_MOVEMENT_SPEED 7.0f
+#define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 45.0f)
 
 #define ENEMY_COUNT 100
 static Enemy enemies[ENEMY_COUNT];
@@ -173,7 +173,7 @@ void EnemySpawn(int tileX, int tileY)
             enemy.alive = true;
             enemy.model = wolf;
             enemies[i] = enemy;
-            tile->enemy = &enemy;
+            *tile->enemy = enemy;
             return;
         }
     }

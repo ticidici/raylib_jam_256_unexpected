@@ -62,8 +62,8 @@ void GameStateUpdate()
 	if (runTimePassed - wave.startTime >= wave.duration)
 	{
 		// Next wave
-		wave.duration = 3;
-		wave.enemiesCount += 1;
+		wave.duration = 20;
+		wave.enemiesCount += 2;
 		wave.startTime = runTimePassed;
 
 		for (int i = 0; i < wave.enemiesCount; i++)

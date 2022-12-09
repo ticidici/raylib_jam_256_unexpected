@@ -17,6 +17,7 @@ struct Bullet
     Model model;
     float speed;
     int damage;
+    Color tint;
     bool alive;
 } typedef Bullet;
 
