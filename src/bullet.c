@@ -45,6 +45,7 @@ void BulletUpdate()
                     if (enemy->hp <= 0)
                     {
                         enemy->alive = false;
+                        tile->enemy = 0;
                     }
                 }
 
