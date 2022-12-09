@@ -5,6 +5,7 @@
 #include "building.h"
 #include "uiManager.h"
 #include "game_state.h"
+#include "bullet.h"
 
 #include "raymath.h"
 
@@ -20,7 +21,6 @@ static Texture2D backgroundTexture;
 static Vector3 YAW = {0, 1.0f, 0};
 
 static float pigScale = 0.025f;
-
 
 void Init()
 {
@@ -39,8 +39,9 @@ void Init()
     backgroundTexture = LoadTexture("resources/background.png");
 
     TerrainInit();
-    EnemyInit();
     BuildingInit();
+    EnemyInit();
+    BulletInit();
 }
 
 void Release()
@@ -54,6 +55,7 @@ void Release()
     EnemyRelease();
     TerrainRelease();
     BuildingRelease();
+    BulletRelease();
 
     CloseWindow();
 }
@@ -88,10 +90,9 @@ void Update()
     if (!IsPaused())
     {
         CameraUpdate();
-
         TerrainUpdate();
-
         EnemyUpdate();
+        BulletUpdate();
     }
 
     UiUpdate();
@@ -106,13 +107,11 @@ void Update()
         BeginMode3D(GetCamera());
         ClearBackground(BLACK);
 
-
-        EnemyRender();
-
         TerrainRender();
+        EnemyRender();
+        BulletRender();
 
         EndMode3D();
-
 
         UiRender();       
     }
@@ -128,5 +127,3 @@ void Update()
     }
     EndDrawing();
 }
-
-
