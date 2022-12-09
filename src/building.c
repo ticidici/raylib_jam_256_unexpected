@@ -6,8 +6,25 @@
 static Model weaponWeak;
 static Model weaponStrong;
 
-Color weaponWeakColor = { 240, 223, 194, 255 };
-Color weaponStrongColor = { 169, 232, 227, 255 };
+static Color weaponWeakColor = { 240, 223, 194, 255 };
+static Color weaponStrongColor = { 169, 232, 227, 255 };
+
+static int weakWeaponPrice = 5;
+static int strongWeaponPrice = 15;
+static int strongWeaponIronNeeded = 3;
+
+static int strawCubeWheatNeeded = 10;
+static int stickCubeWoodNeeded = 10;
+static int brickCubeClayNeeded = 10;
+
+static int sellPriceWeakWeapon = 2;
+static int sellPriceStrongWeapon = 7;
+static int sellIronReturnStrongWeapon = 1;
+
+static int sellStrawCubePrice = 3;
+static int sellStickCubePrice = 7;
+static int sellBrickCubePrice = 13;
+
 
 void BuildingInit()
 {

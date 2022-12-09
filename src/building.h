@@ -3,10 +3,14 @@
 
 #include "raylib.h"
 
+#define STRAW_CUBE_HP 100
+#define STICK_CUBE_HP 250
+#define BRICK_CUBE_HP 500
+
 enum BuildingMaterial
 {
     Straw,
-    Sticks,
+    Stick,
     Brick,
 } typedef BuildingMaterial;
 

@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "building.h"
 #include "uiManager.h"
+#include "game_state.h"
 
 #include "raymath.h"
 
@@ -11,8 +12,6 @@ static const int screenWidth = 256;
 static const int screenHeight = 256;
 
 static RenderTexture2D target = {0}; // Initialized at init
-
-static bool isPaused = false;
 
 static Model pig;
 
@@ -27,7 +26,9 @@ void Init()
 {
     InitWindow(screenWidth, screenHeight, "Unexpected");
     target = LoadRenderTexture(screenWidth, screenHeight);
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);    
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+
+    GameStateInit();
 
     CameraInit();
 
@@ -82,13 +83,9 @@ void Update()
 
     // Update variables / Implement example logic at this point
     //----------------------------------------------------------------------------------
+    GameStateUpdate();
 
-    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P))
-    {
-        isPaused = !isPaused;
-    }
-
-    if (!isPaused)
+    if (!IsPaused())
     {
         CameraUpdate();
 
@@ -97,7 +94,7 @@ void Update()
         EnemyUpdate();
     }
 
-    UiUpdate(isPaused);
+    UiUpdate();
 
     // Draw
     //----------------------------------------------------------------------------------
@@ -117,7 +114,7 @@ void Update()
         EndMode3D();
 
 
-        UiRender(isPaused);       
+        UiRender();       
     }
 
     EndTextureMode();

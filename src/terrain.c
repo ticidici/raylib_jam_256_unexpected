@@ -25,6 +25,43 @@ static Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE] = {0};
 
 bool showHoveredTileInfo = false;
 
+//tile price
+static int grassPrice = 1;//only useful to stop lava
+static int wheatPrice = 2;
+static int woodPrice = 5;
+static int clayPrice = 11;
+static int lavaPrice = 11;
+
+//time tile needs to give resources
+static float wheatYieldTime = 5;//save next timer value and check in game state instead of really counting
+static float woodYieldTime = 10;
+static float clayYieldTime = 15;
+static float ironYieldTime = 30;
+static float wholeSetBonusYield = 1;//+1 every yield if have all the cubes from the same set
+
+//lava special effect
+static float lavaHurtTime = 1;
+static float lavaDamage = 1;
+static float lavaStartExtendTime = 30;
+static float lavaFinishExtendTime = 45;
+
+//resources exchange rate
+static Vector2 wheatWoodRate = { 3, 1 };//give X, receive Y
+static Vector2 wheatClayRate = { 6, 1 };
+static Vector2 wheatIronRate = { 10, 1 };
+
+static Vector2 woodWheatRate = { 1, 2 };
+static Vector2 woodClayRate = { 4, 1 };
+static Vector2 woodIronRate = { 8, 1 };
+
+static Vector2 clayWheatRate = { 1, 3 };
+static Vector2 clayWoodRate = { 1, 2 };
+static Vector2 clayIronRate = { 5, 1 };
+
+static Vector2 ironWheatRate = { 1, 5 };
+static Vector2 ironWoodRate = { 1, 4 };
+static Vector2 ironClayRate = { 1, 3 };
+
 
 Tile *TerrainGetTileSelected()
 {
@@ -120,28 +157,38 @@ void TerrainInit()
 
     Building *building = &battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].building;
     building->blocks[0].model = strawCube;
+    building->blocks[0].buildingMaterial = Straw;
     building->blockCount = 1;
 
     Building *building2 = &battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].building;
     building2->blocks[0].model = stickCube;
+    building2->blocks[0].buildingMaterial = Stick;
     building2->blockCount = 1;
     Building *building3 = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
     building3->blocks[0].model = strawCube;
+    building3->blocks[0].buildingMaterial = Straw;
     building3->blocks[1].model = brickCube;
+    building3->blocks[1].buildingMaterial = Brick;
     building3->blocks[2].model = stickCube;
+    building3->blocks[2].buildingMaterial = Stick;
     building3->blockCount = 3;
 
     Building* building4 = &battlefieldTiles[7][6].building;
     building4->blocks[0].model = stickCube;
+    building4->blocks[2].buildingMaterial = Stick;
     building4->blocks[1].model = brickCube;
+    building4->blocks[2].buildingMaterial = Brick;
     building4->blockCount = 2;
 
     Building* building5 = &battlefieldTiles[8][7].building;
     building5->blocks[0].model = brickCube;
+    building5->blocks[0].buildingMaterial = Brick;
     building5->blocks[0].weaponType = WeaponWeak;
     building5->blocks[1].model = brickCube;
+    building5->blocks[1].buildingMaterial = Brick;
     building5->blocks[1].weaponType = WeaponWeak;
     building5->blocks[2].model = brickCube;
+    building5->blocks[2].buildingMaterial = Brick;
     building5->blocks[2].weaponType = WeaponStrong;
     building5->blockCount = 3;
 

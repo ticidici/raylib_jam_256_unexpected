@@ -13,8 +13,8 @@ struct RectangleSettings
 } typedef RectangleSettings;
 
 void UiInit(int aScreenWidth, int aScreenHeight);
-void UiUpdate(bool isPaused);
-void UiRender(bool isPaused);
+void UiUpdate();
+void UiRender();
 void UiRelease();
 void UiShowTileButtons();
 void UiHideTileButtons();
