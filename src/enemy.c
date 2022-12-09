@@ -173,7 +173,7 @@ void EnemySpawn(int tileX, int tileY)
             enemy.alive = true;
             enemy.model = wolf;
             enemies[i] = enemy;
-            *tile->enemy = enemy;
+            tile->enemy = &enemies[i];
             return;
         }
     }
