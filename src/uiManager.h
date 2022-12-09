@@ -25,6 +25,12 @@ bool UiIsTileWoodButtonPressed();
 bool UiIsTileClayButtonPressed();
 bool UiIsTileLavaButtonPressed();
 
+bool UiIsCubeStrawButtonPressed();
+bool UiIsCubeStickButtonPressed();
+bool UiIsCubeBrickButtonPressed();
+bool UiIsWeaponWeakButtonPressed();
+bool UiIsWeaponStrongButtonPressed();
+
 //private
 void SetRectangleSettings(Rectangle *rectangle, RectangleSettings settings);
 Vector2 GetWidthAndHeightFromCorners(Vector2 topLeft, Vector2 bottomRight);

@@ -9,6 +9,6 @@ enum SoundType
 } typedef SoundType;
 
 
-void PlaySound(SoundType soundType);
+void EmitSound(SoundType soundType);
 
 #endif

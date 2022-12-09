@@ -1,3 +1,6 @@
+#include "raylib.h"
+#include "raymath.h"
+
 #include "game.h"
 #include "enemy.h"
 #include "terrain.h"
@@ -7,7 +10,6 @@
 #include "game_state.h"
 #include "bullet.h"
 
-#include "raymath.h"
 
 static const int screenWidth = 256;
 static const int screenHeight = 256;

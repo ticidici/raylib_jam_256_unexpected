@@ -2,8 +2,16 @@
 #define GAME_STATE_H
 
 #include "raylib.h"
-#include "terrain.h"
 
+enum TileType typedef TileType;
+
+struct EnemyWave
+{
+    int enemiesCount;
+    float startTime;
+    float duration; // Time to next wave in seconds
+
+} typedef EnemyWave;
 
 void GameStateInit();
 void GameStateUpdate();

@@ -1,6 +1,6 @@
 #include "sound.h"
 
-void PlaySound(SoundType soundType) 
+void EmitSound(SoundType soundType)
 {
 	//TODO
 }

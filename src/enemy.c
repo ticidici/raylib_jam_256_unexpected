@@ -10,24 +10,13 @@ static Vector3 YAW = {0, 1.0f, 0};
 #define ENEMY_MOVEMENT_SPEED 10.0f
 #define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 90.0f)
 
-#define ENEMY_COUNT 1
+#define ENEMY_COUNT 100
 static Enemy enemies[ENEMY_COUNT];
 static Model wolf;
 
 void EnemyInit()
 {
     wolf = LoadModel("resources/wolf.glb");
-
-    for (int x = 0; x < BATTLEFIELD_SIZE; x++)
-    {
-        for (int y = 0; y < BATTLEFIELD_SIZE; y++)
-        {
-            if (x == 0 || x == BATTLEFIELD_SIZE - 1 || y == 0 || y == BATTLEFIELD_SIZE - 1)
-            {
-                EnemySpawn(x, y);
-            }
-        }
-    }
 }
 
 void EnemyRelease()
@@ -168,7 +157,7 @@ Enemy *FindClosestEnemy(Vector3 position, float maxDistance)
 void EnemySpawn(int tileX, int tileY)
 {
     Tile *tile = TerrainGetTile(tileX, tileY);
-    if (tile->enemy != 0 || tile->building.blockCount > 0) // Can not spawn on an occupied tile
+    if (!tile || tile->enemy != 0 || tile->building.blockCount > 0) // Can not spawn on an occupied tile
     {
         return;
     }
@@ -219,7 +208,7 @@ void EnemyRender()
         Enemy *enemy = &enemies[i];
         if (enemy->alive)
         {
-            DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025, 0.025, 0.025}, WHITE);
+            DrawModelEx(enemy->model, enemy->position, YAW, enemy->rotation, (Vector3){0.025f, 0.025f, 0.025f}, WHITE);
         }
     }
 }
