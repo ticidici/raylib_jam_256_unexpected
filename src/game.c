@@ -9,6 +9,7 @@
 #include "uiManager.h"
 #include "game_state.h"
 #include "bullet.h"
+#include "sound.h"
 
 
 static const int screenWidth = 256;
@@ -26,6 +27,7 @@ void Init()
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
+    SoundInit();
     GameStateInit();
 
     CameraInit();
@@ -48,6 +50,7 @@ void Release()
     TerrainRelease();
     BuildingRelease();
     BulletRelease();
+    SoundRelease();
 
     CloseWindow();
 }

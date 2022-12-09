@@ -1,6 +1,7 @@
 #include "game_state.h"
 #include "enemy.h"
 #include "terrain.h"
+#include "sound.h"
 
 static bool isPaused = false;
 
@@ -31,6 +32,7 @@ static float bossSpawnTime = 900;
 
 static EnemyWave wave;
 
+
 void GameStateInit()
 {
 	isPaused = false;
@@ -48,6 +50,7 @@ void GameStateInit()
 	wave.startTime = 0;
 	wave.duration = 3;
 	wave.enemiesCount = 0;
+
 }
 
 void GameStateUpdate()
@@ -65,6 +68,8 @@ void GameStateUpdate()
 		wave.duration = 20;
 		wave.enemiesCount += 2;
 		wave.startTime = runTimePassed;
+
+		PlaySoundMulti(waveSound);
 
 		for (int i = 0; i < wave.enemiesCount; i++)
 		{

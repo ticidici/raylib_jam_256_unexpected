@@ -9,6 +9,12 @@ enum SoundType
 } typedef SoundType;
 
 
+extern Sound waveSound;
+
+void SoundInit();
+
+void SoundRelease();
+
 void EmitSound(SoundType soundType);
 
 #endif
