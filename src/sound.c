@@ -4,14 +4,14 @@
 Sound waveSound;
 
 void SoundInit() {
-	InitAudioDevice();
-	waveSound = LoadSound("resources/wave.mp3");
+	//InitAudioDevice();
+	//waveSound = LoadSound("resources/wave.mp3");
 }
 
 void SoundRelease() {
-	StopSoundMulti();
-	UnloadSound(waveSound);
-	CloseAudioDevice();
+	//StopSoundMulti();
+	//UnloadSound(waveSound);
+	//CloseAudioDevice();
 }
 
 void EmitSound(SoundType soundType)

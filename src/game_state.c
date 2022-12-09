@@ -65,7 +65,7 @@ void GameStateUpdate()
 	if (runTimePassed - wave.startTime >= wave.duration)
 	{
 		if (wave.number > 0) {
-			PlaySoundMulti(waveSound);
+			// PlaySoundMulti(waveSound);
 		}
 
 		// Next wave
