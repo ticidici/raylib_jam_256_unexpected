@@ -756,7 +756,7 @@ void UiRender()
             }
 
             //enemy
-            char* enemyText = "no enemy";
+            const char* enemyText = "no enemy";
             Enemy* enemy = tileSelected->enemy;
             if (enemy != 0)
             {
