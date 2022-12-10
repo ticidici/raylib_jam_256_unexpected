@@ -49,8 +49,9 @@ static float nextClayYield = 0;
 static float nextIronYield = 0;
 
 //lava special effect
-static float lavaBurnPeriod = 1;//every X seconds
+static float lavaBurnPeriod = 3;//every X seconds
 static float lavaDamage = 1;
+static float lavaDamageBuilding = 4;
 static float lavaStartExtendTime = 30;
 static float lavaFinishExtendTime = 45;
 static Color lavaAboutToExtendColor = { 255, 160, 160, 255};
@@ -122,25 +123,26 @@ void TerrainInit()
                 int randomValue = GetRandomValue(0, 100);
                 if ((i >= FORTRESS_FIRST_TILE_INDEX && i <= FORTRESS_LAST_TILE_INDEX) && (j >= FORTRESS_FIRST_TILE_INDEX && j <= FORTRESS_LAST_TILE_INDEX))
                 {
-                    if (randomValue < 10 && IsLavaUnlocked())
+                    if (randomValue < 1 && IsLavaUnlocked() && i != MIDDLE_TILE_INDEX && j != MIDDLE_TILE_INDEX)
                     {
                         battlefieldTiles[i][j].tileModel = lavaTile;
                         battlefieldTiles[i][j].tileType = LavaType;
+                        if (battlefieldTiles[i][j].building.blockCount > 0) BuildingLavaDamage(&battlefieldTiles[i][j]);
                         battlefieldTiles[i][j].lavaNextExtendStart = 0 + lavaStartExtendTime;
                         battlefieldTiles[i][j].lavaNextExtendFinish = 0 + lavaFinishExtendTime;
                         battlefieldTiles[i][j].lavaAboutToExtend = false;
                     }
-                    else if (randomValue < 20)
+                    else if (randomValue < 4)
                     {
                         battlefieldTiles[i][j].tileModel = wheatTile;
                         battlefieldTiles[i][j].tileType = WheatType;
                     }
-                    else if (randomValue < 30)
+                    else if (randomValue < 6)
                     {
                         battlefieldTiles[i][j].tileModel = woodTile;
                         battlefieldTiles[i][j].tileType = WoodType;
                     }
-                    else if (randomValue < 40)
+                    else if (randomValue < 5)
                     {
                         battlefieldTiles[i][j].tileModel = clayTile;
                         battlefieldTiles[i][j].tileType = ClayType;
@@ -491,6 +493,12 @@ void EnemySteppedOnLava(Enemy* enemy, Tile* tile)
     }
 }
 
+void BuildingLavaDamage(Tile* tile)
+{
+    BuildingDamageBlock(&tile->building, 0, lavaDamageBuilding);
+    tile->lavaNextBurn = GetRunTime() + lavaBurnPeriod;
+}
+
 bool IsThunderboltReady()
 {
     return GetRunTime() >= nextThunderboltActiveTime;
@@ -684,6 +692,11 @@ void CalculateTileEffects()
                 {
                     EnemySteppedOnLava(candidateTile->enemy, candidateTile);
                 }
+            
+                if (candidateTile->building.blockCount > 0 && runTime >= candidateTile->lavaNextBurn)
+                {
+                    BuildingLavaDamage(candidateTile);
+                }
             }
         }
     }
@@ -709,6 +722,7 @@ void PerformThunderbolt()
             damage = thunderboltDamage.x;
             affectedTile->tileType = LavaType;
             affectedTile->tileModel = lavaTile;
+            if (affectedTile->building.blockCount > 0) BuildingLavaDamage(affectedTile);
         }
         if (affectedTile->enemy != 0)
         {

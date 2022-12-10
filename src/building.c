@@ -47,8 +47,8 @@ int extraPorquetSellBonusClay = 10;
 
 static int porquetBlocksHp = 50;
 static int strawBlockHp = 10;
-static int stickBlockHp = 20;
-static int brickBlockHp = 30;
+static int stickBlockHp = 22;
+static int brickBlockHp = 35;
 
 void BuildingInit()
 {
@@ -171,7 +171,10 @@ void BuildingDamageBlock(Building* building, int blockIndex, int damage)
     if (blockIndex - 1 > building->blockCount) return;
 
     building->blocks[blockIndex].hp -= damage;
-    if (building->blocks[blockIndex].hp <= 0) BuildingDestroyBlock(building, blockIndex);
+    if (building->blocks[blockIndex].hp <= 0)
+    {
+        BuildingDestroyBlock(building, blockIndex);
+    }
 }
 
 void BuildingDestroyBlock(Building *building, int blockIndex)
@@ -246,9 +249,9 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blocks[index].hp = brickBlockHp;
         tile->building.blockCount++;
-         PlaySound(soundBuild);
+        PlaySound(soundBuild);
     }
-
+    if(tile->building.blockCount == 1 && tile->tileType == LavaType) BuildingLavaDamage(tile);
 }
 
 void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)

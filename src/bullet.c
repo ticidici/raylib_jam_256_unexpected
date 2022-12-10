@@ -77,7 +77,7 @@ void BulletSpawn(Vector3 position, Enemy *target, WeaponType type)
             bullet->position = position;
             bullet->direction = Vector3Normalize(Vector3Subtract(tile->position, position));
             bullet->speed = type == WeaponWeak ? 60.0f : 40.0f;
-            bullet->damage = type == WeaponWeak ? 1 : 2;
+            bullet->damage = type == WeaponWeak ? 1 : 3;
             bullet->targetX = tile->coordX;
             bullet->targetY = tile->coordY;
             bullet->model = type == WeaponWeak ? smallBullet : bigBullet;

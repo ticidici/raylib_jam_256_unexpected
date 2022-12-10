@@ -63,6 +63,7 @@ void TerrainBuyTile(TileType tileType, Tile *tile);
 bool ShouldShowTileInfo();
 
 void EnemySteppedOnLava(Enemy* enemy, Tile* tile);
+void BuildingLavaDamage(Tile* tile);
 bool IsThunderboltReady();
 
 // Private
