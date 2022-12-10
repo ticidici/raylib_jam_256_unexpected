@@ -65,7 +65,7 @@ void GameStateUpdate()
 		state = Start;
 	}
 
-	if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P))
+	if ((state == Running || state == Paused) && (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P)))
 	{
 		state = state == Running ? Paused : Running;
 	}
