@@ -45,13 +45,16 @@ void BuildingUpdate(Building *building, Vector3 position);
 
 void BuildingRender(Building *building, Vector3 position);
 
-void BuildingDestroyBlock(Building *building, int blockPosition);
+void BuildingDamageBlock(Building *building, int blockIndex, int damage);
+void BuildingDestroyBlock(Building *building, int blockIndex);
 
 void BuildingRelease();
 
 void BuildingBuyCube(BuildingMaterial materialType, Tile *tile);
 void BuildingBuyWeapon(WeaponType weaponType, Tile *tile, int cubeIndex);
 void BuildingSellBlock(Tile* tile, int blockIndex);
+
+int GetPorquetBlocksHp();
 
 bool IsWholeSet(Tile* tile);
 

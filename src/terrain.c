@@ -53,6 +53,7 @@ static float lavaBurnPeriod = 1;//every X seconds
 static float lavaDamage = 1;
 static float lavaStartExtendTime = 30;
 static float lavaFinishExtendTime = 45;
+static Color lavaAboutToExtendColor = { 255, 160, 160, 255};
 
 //resources exchange rate
 static Vector2 wheatWoodRate = { 3, 1 };//give X, receive Y
@@ -71,6 +72,12 @@ static Vector2 ironWheatRate = { 1, 5 };
 static Vector2 ironWoodRate = { 1, 4 };
 static Vector2 ironClayRate = { 1, 3 };
 
+//thunderbolt
+static float nextThunderboltActiveTime = 0;
+static float thunderboltCooldown = 20.0f;
+static float thunderboltDuration = 0.04f;
+static float nextThunderboltStop = 0;
+static Vector2 thunderboltDamage = { 999, 20 };//tile, adjacent
 
 Tile *TerrainGetTileSelected()
 {
@@ -169,34 +176,19 @@ void TerrainInit()
     nextClayYield = clayYieldTime;
     nextIronYield = ironYieldTime;
 
-    Building *building = &battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].building;
-    building->blocks[0].buildingMaterial = Straw;
-    building->blockCount = 1;
+    nextThunderboltActiveTime = thunderboltCooldown;
+    nextThunderboltStop = 0;
 
-    Building *building2 = &battlefieldTiles[FORTRESS_LAST_TILE_INDEX][FORTRESS_LAST_TILE_INDEX].building;
-    building2->blocks[0].buildingMaterial = Stick;
-    building2->blockCount = 1;
-    Building *building3 = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
-    building3->isPorquet = true;
-    building3->blocks[0].buildingMaterial = Straw;
-    building3->blocks[1].buildingMaterial = Brick;
-    building3->blocks[2].buildingMaterial = Stick;
-    building3->blockCount = 3;
-
-    Building* building4 = &battlefieldTiles[7][6].building;
-    building4->blocks[2].buildingMaterial = Stick;
-    building4->blocks[2].buildingMaterial = Brick;
-    building4->blockCount = 2;
-
-    Building* building5 = &battlefieldTiles[8][7].building;
-    building5->blocks[0].buildingMaterial = Brick;
-    building5->blocks[0].weaponType = WeaponWeak;
-    building5->blocks[1].buildingMaterial = Brick;
-    building5->blocks[1].weaponType = WeaponWeak;
-    building5->blocks[2].buildingMaterial = Brick;
-    building5->blocks[2].weaponType = WeaponStrong;
-    building5->blockCount = 3;
-
+    //only blocks in the begginning, don't erase
+    Building *buildingPorquet = &battlefieldTiles[MIDDLE_TILE_INDEX][MIDDLE_TILE_INDEX].building;
+    buildingPorquet->isPorquet = true;
+    buildingPorquet->blocks[0].buildingMaterial = Brick;
+    buildingPorquet->blocks[0].hp = GetPorquetBlocksHp();
+    buildingPorquet->blocks[1].buildingMaterial = Brick;
+    buildingPorquet->blocks[1].hp = GetPorquetBlocksHp();
+    buildingPorquet->blocks[2].buildingMaterial = Brick;
+    buildingPorquet->blocks[2].hp = GetPorquetBlocksHp();
+    buildingPorquet->blockCount = 3;
 }
 
 void TerrainRelease()
@@ -215,12 +207,13 @@ void TerrainRelease()
 void TerrainUpdate()
 {
     bool tileJustDeselected = false;
-
+    bool clickedInButton = false;
     if (isTileSelected)
     {
         //if clicked on option confirm and deselect (even if it is not executed)
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
+            clickedInButton = true;
             //if button is clicked don't deselect
             //tile
             if (UiIsTileGrassButtonPressed())
@@ -299,15 +292,27 @@ void TerrainUpdate()
             }
 
             //outside tile buttons
-            else if (!IsPointInsideTileInScreenSpace(GetMousePosition(), tileHovered, TILE_HALF_WIDTH))
-            {
-                isTileSelected = false;
-                tileJustDeselected = true;
-                UiHideRightSideButtons();
-            }
             else
             {
-                showHoveredTileInfo = !showHoveredTileInfo;
+                clickedInButton = false;
+
+                if (UiIsThunderboltPressed())
+                {
+                    if (UiIsThunderboltCursor())
+                    {
+                        UiStopThunderbolt();
+                    }
+                }
+                if (!IsPointInsideTileInScreenSpace(GetMousePosition(), tileHovered, TILE_HALF_WIDTH))
+                {
+                    isTileSelected = false;
+                    tileJustDeselected = true;
+                    UiHideRightSideButtons();
+                }
+                else
+                {
+                    showHoveredTileInfo = !showHoveredTileInfo;
+                }
             }
         }
 
@@ -322,6 +327,21 @@ void TerrainUpdate()
 
     //we update selector before doing anything with it
     UpdateTileSelector();
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        if (!clickedInButton && UiIsThunderboltCursor())
+        {
+            PerformThunderbolt();
+        }
+        else if (UiIsThunderboltPressed())
+        {
+            if (IsThunderboltReady())
+            {
+                tileJustDeselected = true;
+            }
+        }
+    }
 
     if (!tileJustDeselected && !isTileSelected)
     {
@@ -367,6 +387,20 @@ void TerrainRender()
 
     DrawModel(tileSelector, tileHovered->position, 1.f, WHITE);
 
+    bool isThunderbolt = UiIsThunderboltCursor();
+    Vector2 surroundingTilesIndexes[8] = {0};
+    Vector2 tileHoveredIndexes = { tileHovered->coordX,  tileHovered->coordY };
+    if (isThunderbolt)
+    {
+        Vector2 surroundingTilesOffsets[8] = {  (Vector2) { -1, 1 },    (Vector2) { 0, 1 },     (Vector2) { 1, 1 }, 
+                                                (Vector2) { -1, 0 },                            (Vector2) { 1, 0 }, 
+                                                (Vector2) { -1, -1 },   (Vector2) { 0, -1 },    (Vector2) { 1, -1 } };
+        for (int i = 0; i < 8; i++)
+        {
+            surroundingTilesIndexes[i] = (Vector2){ tileHoveredIndexes.x + surroundingTilesOffsets[i].x,  tileHoveredIndexes.y + surroundingTilesOffsets[i].y };
+        }
+    }
+
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
@@ -374,7 +408,20 @@ void TerrainRender()
             Tile *tile = &battlefieldTiles[i][j];
             BuildingRender(&tile->building, tile->position);
             Color color = WHITE;
-            if (tile->tileType == LavaType && tile->lavaAboutToExtend) color = RED;
+            if (tile->tileType == LavaType && tile->lavaAboutToExtend) color = lavaAboutToExtendColor;
+
+            if (isThunderbolt)
+            {
+                if (i == tileHoveredIndexes.x && j == tileHoveredIndexes.y) color = RED;
+                for (int surroundingIndex = 0; surroundingIndex < 8; surroundingIndex++)
+                {
+                    if (i == surroundingTilesIndexes[surroundingIndex].x && j == surroundingTilesIndexes[surroundingIndex].y)
+                    {
+                        color = (Color) { 255, 160, 160, 255 };
+                        break;
+                    }
+                }
+            }
             DrawModel(battlefieldTiles[i][j].tileModel, battlefieldTiles[i][j].position, 1.f, color);
         }
     }
@@ -435,16 +482,16 @@ bool ShouldShowTileInfo()
 
 void EnemySteppedOnLava(Enemy* enemy, Tile* tile)
 {
-    enemy->hp -= lavaDamage;
-    if (enemy->hp <= 0)
-    {
-        enemy->alive = false;
-        tile->enemy = 0;
-    }
-    else
+
+    if(!DamageEnemy(tile,enemy, lavaDamage))
     {
         tile->lavaNextBurn = GetRunTime() + lavaBurnPeriod;
     }
+}
+
+bool IsThunderboltReady()
+{
+    return GetRunTime() >= nextThunderboltActiveTime;
 }
 
 void TerrainBuyTile(TileType tileType, Tile *tile)
@@ -587,25 +634,49 @@ void CalculateTileEffects()
                     if (IsWholeSet(candidateTile)) ModifyResource(LavaType, wholeSetBonusResourceYield);
                 }
 
-                //if (runTime >= candidateTile->lavaNextExtendStart)
-                //{
-                //    candidateTile->lavaNextExtendStart = candidateTile->lavaNextExtendFinish + lavaStartExtendTime;
-                //    candidateTile->lavaAboutToExtend = true;
-                //}
-                //
-                //if (runTime >= candidateTile->lavaNextExtendFinish)
-                //{
-                //    candidateTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
-                //    int x = candidateTile->coordX;
-                //    int y = candidateTile->coordY;
-                //    Vector2 surroundingTiles[8] = { (Vector2) {-1, -1}, (Vector2) { -1, 1 ...} }
-                //    GetRandomValue(1, 8);
-                //    for (int surroundingTileIdx = 0; surroundingTileIdx < 8; surroundingTileIdx++)
-                //    {
-                //
-                //    }
-                //
-                //}
+                if (runTime >= candidateTile->lavaNextExtendStart)
+                {
+                    candidateTile->lavaNextExtendStart = candidateTile->lavaNextExtendFinish + lavaStartExtendTime;
+                    candidateTile->lavaAboutToExtend = true;
+                }
+                
+                if (runTime >= candidateTile->lavaNextExtendFinish)
+                {
+                    candidateTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
+                    candidateTile->lavaAboutToExtend = false;
+
+                    int lavaCoordX = candidateTile->coordX;
+                    int lavaCoordY = candidateTile->coordY;
+
+                    //Vector2 surroundingTiles[8] = { (Vector2) { -1, 1 },    (Vector2) { 0, 1 },     (Vector2) { 1, 1 }, 
+                    //                                (Vector2) { -1, 0 },                            (Vector2) { 1, 0 }, 
+                    //                                (Vector2) { -1, -1 },   (Vector2) { 0, -1 },    (Vector2) { 1, -1 } };
+                    
+                    Vector2 surroundingTiles[4] = {                         (Vector2) { 0, 1 },      
+                                                    (Vector2) { -1, 0 },                            (Vector2) { 1, 0 }, 
+                                                                            (Vector2) { 0, -1 },                      };
+
+                    int indexOffset = GetRandomValue(0, 4);
+                    for (int indexNoOffset = 0; indexNoOffset < 4; indexNoOffset++)
+                    {
+                        int surroundingTileIdx = (indexNoOffset + indexOffset) % 4;
+                        Vector2 coordOffset = surroundingTiles[surroundingTileIdx];
+                        Vector2 surroundingTileCoordinates = { lavaCoordX + coordOffset.x, lavaCoordY + coordOffset.y };
+                        Tile* surroundingTile = TerrainGetTile(surroundingTileCoordinates.x, surroundingTileCoordinates.y);
+
+                        if (surroundingTile->tileType == DirtType || surroundingTile->tileType == LavaType) continue;
+                        if (surroundingTile->building.isPorquet) continue;//don't lava porquet's butt
+
+                        surroundingTile->tileType = LavaType;
+                        surroundingTile->tileModel = lavaTile;
+                        surroundingTile->lavaAboutToExtend = false;
+                        surroundingTile->lavaNextExtendStart = runTime + lavaStartExtendTime;
+                        surroundingTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
+                        if (surroundingTile->enemy != 0) EnemySteppedOnLava(surroundingTile->enemy, surroundingTile);
+                        break;
+                    }
+                
+                }
                 
                 if (candidateTile->enemy != 0 && runTime >= candidateTile->lavaNextBurn)
                 {
@@ -614,4 +685,38 @@ void CalculateTileEffects()
             }
         }
     }
+}
+
+void PerformThunderbolt()
+{
+    nextThunderboltActiveTime = GetRunTime() + thunderboltCooldown;
+    nextThunderboltStop = GetRunTime() + thunderboltDuration;
+
+    Vector2 affectedTilesIndexes[9] = { 0 };
+    Vector2 tileHoveredIndexes = { tileHovered->coordX,  tileHovered->coordY };
+    Vector2 affectedTilesOffsets[9] = {  (Vector2) { -1, 1 },    (Vector2) { 0, 1 },     (Vector2) { 1, 1 }, 
+                                            (Vector2) { -1, 0 },    (Vector2) { 0, 0 },     (Vector2) { 1, 0 },
+                                            (Vector2) { -1, -1 },   (Vector2) { 0, -1 },    (Vector2) { 1, -1 } };
+    for (int i = 0; i < 9; i++)
+    {
+        Vector2 tileIndexes = (Vector2){ tileHoveredIndexes.x + affectedTilesOffsets[i].x,  tileHoveredIndexes.y + affectedTilesOffsets[i].y };
+        int damage = thunderboltDamage.y;
+        Tile* affectedTile = TerrainGetTile(tileIndexes.x, tileIndexes.y);
+        if (tileIndexes.x == tileHoveredIndexes.x && tileIndexes.y == tileHoveredIndexes.y)
+        {
+            damage = thunderboltDamage.x;
+            affectedTile->tileType = LavaType;
+            affectedTile->tileModel = lavaTile;
+        }
+        if (affectedTile->enemy != 0)
+        {
+            DamageEnemy(affectedTile, affectedTile->enemy, damage);
+        }
+
+        if (affectedTile->building.blockCount > 0)
+        {
+            BuildingDamageBlock(&affectedTile->building,0,damage);
+        }
+    }
+
 }

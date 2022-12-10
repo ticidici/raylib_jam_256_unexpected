@@ -45,6 +45,8 @@ bool UiIsSellFloor2Pressed();
 bool UiIsSellFloor3Pressed();
 
 bool UiIsThunderboltPressed();
+bool UiIsThunderboltCursor();
+void UiStopThunderbolt();
 
 //private
 void SetRectangleSettings(Rectangle *rectangle, RectangleSettings settings);

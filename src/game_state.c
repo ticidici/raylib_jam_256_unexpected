@@ -16,10 +16,6 @@ static float wood = 10;
 static float clay = 10;
 static float iron = 0;
 
-static float thunderboltNextTime = 0;
-static float thunderboltCooldown = 15.0f;
-static Vector2 thunderboltDamage = { 999, 20 };//tile, adjacent
-
 static float lavaUnlockTime = 300;
 static float thunderboltUnlockTime = 420;
 static float fastEnemyUnlockTime = 180;
@@ -43,7 +39,6 @@ void GameStateInit()
 	wood = 10;
 	clay = 10;
 	iron = 0;
-	thunderboltNextTime = 0;
 
 	bossSpawned = false;
 
@@ -178,16 +173,6 @@ void ModifyResource(TileType tileType, int value)
 		else if (iron < 0)
 			iron = 0;
 	}
-}
-
-bool IsThunderboltReady()
-{
-	return runTimePassed >= thunderboltNextTime;
-}
-
-Vector2 GetThunderboltDamage()
-{
-	return thunderboltDamage;
 }
 
 bool IsThunderboltUnlocked()
