@@ -2,6 +2,7 @@
 #include "raymath.h"
 #include "terrain.h"
 #include <stdlib.h>
+#include "game_state.h"
 
 static Vector3 YAW = {0, 1.0f, 0};
 
@@ -96,6 +97,10 @@ void EnemyUpdateOne(Enemy *enemy)
             {
                 EnemySteppedOnLava(enemy, tile);
             }
+            if (enemy->x == MIDDLE_TILE_INDEX && enemy->y == MIDDLE_TILE_INDEX) {
+                // Enemy placed on center, enemy won
+                state = GameOver;
+            }
         }
 
         if (target != 0)
@@ -114,7 +119,6 @@ void EnemyUpdateOne(Enemy *enemy)
         }
         else
         {
-
             // Find center
             if (now - enemy->lastMoveTime > ENEMY_MOVEMENT_COLDOWN)
             {
@@ -124,6 +128,7 @@ void EnemyUpdateOne(Enemy *enemy)
                 int dirX, dirY;
                 EnemyGetTargetDir(enemy, MIDDLE_TILE_INDEX, MIDDLE_TILE_INDEX, &dirX, &dirY);
                 enemy->rotationTarget = EnemyGetTargetRotation(dirX, dirY);
+
 
                 int nextX = enemy->x + dirX;
                 int nextY = enemy->y + dirY;
@@ -141,6 +146,7 @@ void EnemyUpdateOne(Enemy *enemy)
                     nextTile->enemy = enemy;
                     enemy->arrivedToTile = false;
                 }
+
             }
         }
     }

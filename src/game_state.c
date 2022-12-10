@@ -61,6 +61,10 @@ void GameStateUpdate()
 		state = Running;
 	}
 
+	if (state == GameOver && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		state = Start;
+	}
+
 	if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P))
 	{
 		state = state == Running ? Paused : Running;

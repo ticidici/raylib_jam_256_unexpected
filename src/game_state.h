@@ -17,7 +17,8 @@ struct EnemyWave
 enum GameState {
     Start,
     Running,
-    Paused
+    Paused,
+    GameOver,
 } typedef GameState;
 
 extern GameState state;

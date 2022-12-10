@@ -985,8 +985,17 @@ void UiRender()
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
         DrawText("GAME PAUSED", 66, 98, 18, MAROON);
     }
+    // Title screen
     if (state == Start) {
         DrawTexture(startScreenTexture, 0, 0, WHITE);
+    }
+    // GameOver screen
+    if (state == GameOver)
+    {
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
+        DrawText("GAME OVER", 76, 80, 18, MAROON);
+        DrawText(TextFormat("SURVIVED %02i:%02i", minutes, seconds), 72, 110, 14, MAROON);
+        DrawText("CLICK TO GO TO TITLE SCREEN", 46, 180, 8, MAROON);
     }
 
     // FPS
