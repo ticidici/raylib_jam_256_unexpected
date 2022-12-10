@@ -23,7 +23,11 @@ static Vector3 YAW = {0, 1.0f, 0};
 
 void Init()
 {
-    InitWindow(screenWidth, screenHeight, "Unexpected");
+
+    unsigned int screenScale = GetCurrentScreenScale();
+    InitWindow(screenWidth * screenScale, screenHeight * screenScale, "Unexpected");
+    SetMouseScale(1.0f / (float)screenScale, 1.0f / (float)screenScale);
+
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
@@ -57,7 +61,7 @@ void Release()
 void Update()
 {
     // Screen scale logic (x2)
-    if (IsKeyPressed(KEY_ONE))
+    /*if (IsKeyPressed(KEY_ONE))
         SetCurrentScreenScale(1);
     else if (IsKeyPressed(KEY_TWO))
         SetCurrentScreenScale(2);
@@ -75,7 +79,7 @@ void Update()
         SetMouseScale(1.0f / (float)screenScale, 1.0f / (float)screenScale);
 
         SetPreviousScreenScale(screenScale);
-    }
+    }*/
 
     // Update variables / Implement example logic at this point
     //----------------------------------------------------------------------------------
