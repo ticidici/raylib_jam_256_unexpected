@@ -51,5 +51,8 @@ void BuildingRelease();
 
 void BuildingBuyCube(BuildingMaterial materialType, Tile *tile);
 void BuildingBuyWeapon(WeaponType weaponType, Tile *tile, int cubeIndex);
+void BuildingSellBlock(Tile* tile, int blockIndex);
+
+bool IsWholeSet(Tile* tile);
 
 #endif

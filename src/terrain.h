@@ -53,5 +53,6 @@ bool ShouldShowTileInfo();
 // Private
 void DrawGridCentered(float tileSpacing, int tileCount);
 void UpdateTileSelector();
+void CalculateTilesYield();
 
 #endif

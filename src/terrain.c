@@ -30,11 +30,22 @@ static int clayPrice = 11;
 static int lavaPrice = 11;
 
 //time tile needs to give resources
-static float wheatYieldTime = 5;//save next timer value and check in game state instead of really counting
+static int moneyYieldQuantity = 1;
+static float moneyYieldTime = 7;//each house yields 
+
+static float wheatYieldTime = 5;//each tile yields
 static float woodYieldTime = 10;
 static float clayYieldTime = 15;
 static float ironYieldTime = 30;
-static float wholeSetBonusYield = 1;//+1 every yield if have all the cubes from the same set
+
+static int wholeSetBonusMoneyYield = 5;//+X every yield if we have all the cubes from the same set
+static int wholeSetBonusResourceYield = 1;
+
+static float nextMoneyYield = 0; //save next timer value and check in game state instead of really counting
+static float nextWheatYield = 0;
+static float nextWoodYield = 0;
+static float nextClayYield = 0;
+static float nextIronYield = 0;
 
 //lava special effect
 static float lavaHurtTime = 1;
@@ -148,6 +159,12 @@ void TerrainInit()
         }
     }
 
+    nextMoneyYield = moneyYieldTime;
+    nextWheatYield = wheatYieldTime;
+    nextWoodYield = woodYieldTime;
+    nextClayYield = clayYieldTime;
+    nextIronYield = ironYieldTime;
+
     Building *building = &battlefieldTiles[FORTRESS_FIRST_TILE_INDEX][FORTRESS_FIRST_TILE_INDEX].building;
     building->blocks[0].buildingMaterial = Straw;
     building->blockCount = 1;
@@ -205,7 +222,6 @@ void TerrainUpdate()
             if (UiIsTileGrassButtonPressed())
             {
                 TerrainBuyTile(GrassType, tileHovered);
-
             }
             else if (UiIsTileWheatButtonPressed())
             {
@@ -239,17 +255,43 @@ void TerrainUpdate()
             //weapon
             else if (UiIsWeaponWeakButtonPressed())
             {
-                if (tileHovered->building.blockCount > 0)
-                {
-                    //BuildingBuyWeapon(WeaponWeak, tileHovered);
-                }
+                //don't deselect
             }
             else if (UiIsWeaponStrongButtonPressed())
             {
-                if (tileHovered->building.blockCount > 0)
-                {
-                    //BuildingBuyWeapon(WeaponStrong, tileHovered);
-                }
+                //don't deselect
+            }
+            else if (UiIsWeaponFloor1ButtonPressed())
+            {
+                WeaponType weaponType = WhichWeaponIsSelected();
+                BuildingBuyWeapon(weaponType, tileHovered, 0);
+            }
+            else if (UiIsWeaponFloor2ButtonPressed())
+            {
+                WeaponType weaponType = WhichWeaponIsSelected();
+                BuildingBuyWeapon(weaponType, tileHovered, 1);
+            }
+            else if (UiIsWeaponFloor3ButtonPressed())
+            {
+                WeaponType weaponType = WhichWeaponIsSelected();
+                BuildingBuyWeapon(weaponType, tileHovered, 2);
+            }
+            //sell
+            else if (UiIsSellButtonPressed())
+            {
+                //don't deselect
+            }
+            else if (UiIsSellFloor1Pressed())
+            {
+                BuildingSellBlock(tileHovered, 0);
+            }
+            else if (UiIsSellFloor2Pressed())
+            {
+                BuildingSellBlock(tileHovered, 1);
+            }
+            else if (UiIsSellFloor3Pressed())
+            {
+                BuildingSellBlock(tileHovered, 2);
             }
 
             //outside tile buttons
@@ -257,7 +299,7 @@ void TerrainUpdate()
             {
                 isTileSelected = false;
                 tileJustDeselected = true;
-                UiHideTileButtons();
+                UiHideRightSideButtons();
             }
             else
             {
@@ -270,7 +312,7 @@ void TerrainUpdate()
         {
             isTileSelected = false;
             tileJustDeselected = true;
-            UiHideTileButtons();
+            UiHideRightSideButtons();
         }
     }
 
@@ -290,7 +332,7 @@ void TerrainUpdate()
             else
             {
                 isTileSelected = true;
-                UiShowTileButtons();
+                UiShowRightSideButtons();
             }
         }
     }
@@ -312,6 +354,8 @@ void TerrainUpdate()
     {
         showHoveredTileInfo = !showHoveredTileInfo;
     }
+
+    CalculateTilesYield();
 }
 
 void TerrainRender()
@@ -433,4 +477,90 @@ void TerrainBuyTile(TileType tileType, Tile *tile)
             break;
     }
     tile->tileType = tileType;
+}
+
+void CalculateTilesYield()
+{
+    float runTime = GetRunTime();
+
+    bool yieldMoney = false;
+    bool yieldWheat = false;
+    bool yieldWood = false;
+    bool yieldClay = false;
+    bool yieldIron = false;
+
+    if (runTime >= nextMoneyYield)
+    {
+        nextMoneyYield += moneyYieldTime;
+        yieldMoney = true;
+    }
+    if (runTime >= nextWheatYield)
+    {
+        nextWheatYield += wheatYieldTime;
+        yieldWheat = true;
+    }
+    if (runTime >= nextWoodYield)
+    {
+        nextWoodYield += woodYieldTime;
+        yieldWood = true;
+    }
+    if (runTime >= nextClayYield)
+    {
+        nextClayYield += clayYieldTime;
+        yieldClay = true;
+    }
+    if (runTime >= nextIronYield)
+    {
+        nextIronYield += ironYieldTime;
+        yieldIron = true;
+    }
+
+    if (!yieldMoney && !yieldWheat && !yieldWood && !yieldClay && !yieldIron) return;
+
+    for (int i = 0; i < BATTLEFIELD_SIZE; i++)
+    {
+        //if outside the fortress, continue
+        if (i < FORTRESS_FIRST_TILE_INDEX || i > FORTRESS_LAST_TILE_INDEX) continue;
+
+        for (int j = 0; j < BATTLEFIELD_SIZE; j++)
+        {
+            //if outside the fortress, continue
+            if (j < FORTRESS_FIRST_TILE_INDEX || j > FORTRESS_LAST_TILE_INDEX) continue;
+
+            Tile* candidateTile = &battlefieldTiles[i][j];
+
+            if (yieldMoney)
+            {
+                if (candidateTile->building.blockCount > 0)
+                {
+                    ModifyMoney(candidateTile->building.blockCount * moneyYieldQuantity);
+                    if (IsWholeSet(candidateTile)) ModifyMoney(wholeSetBonusMoneyYield);
+                }
+            }
+
+            if (yieldWheat && candidateTile->tileType == WheatType)
+            {
+                ModifyResource(WheatType, 1);
+                if (IsWholeSet(candidateTile)) ModifyResource(WheatType, wholeSetBonusResourceYield);
+            }
+
+            if (yieldWood && candidateTile->tileType == WoodType)
+            {
+                ModifyResource(WoodType, 1);
+                if (IsWholeSet(candidateTile)) ModifyResource(WoodType, wholeSetBonusResourceYield);
+            }
+        
+            if (yieldClay && candidateTile->tileType == ClayType)
+            {
+                ModifyResource(ClayType, 1);
+                if (IsWholeSet(candidateTile)) ModifyResource(ClayType, wholeSetBonusResourceYield);
+            }
+        
+            if (yieldIron && candidateTile->tileType == LavaType)
+            {
+                ModifyResource(LavaType, 1);
+                if (IsWholeSet(candidateTile)) ModifyResource(LavaType, wholeSetBonusResourceYield);
+            }
+        }
+    }
 }

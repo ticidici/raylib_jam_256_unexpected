@@ -39,6 +39,11 @@ static int sellStrawCubePrice = 3;
 static int sellStickCubePrice = 7;
 static int sellBrickCubePrice = 13;
 
+static int extraPorquetSellBonusMoney = 50;
+static int extraPorquetSellBonusWheat = 5;
+static int extraPorquetSellBonusWood = 5;
+static int extraPorquetSellBonusClay = 10;
+
 void BuildingInit()
 {
     pig = LoadModel("resources/pig.glb");
@@ -128,12 +133,14 @@ void BuildingRender(Building *building, Vector3 position)
     }
 }
 
-void BuildingDestroyBlock(Building *building, int blockPosition)
+void BuildingDestroyBlock(Building *building, int blockIndex)
 {
-    if (blockPosition - 1 > building->blockCount)
+    if (blockIndex - 1 > building->blockCount)
         return;
 
-    for (int i = blockPosition + 1; i < building->blockCount; i++)
+    building->blocks[blockIndex].weaponType = WEAPON_NONE;
+
+    for (int i = blockIndex + 1; i < building->blockCount; i++)
     {
         building->blocks[i - 1] = building->blocks[i];
         building->blocks[i - 1].destroyOffset = BLOCK_HEIGHT;
@@ -145,6 +152,13 @@ void BuildingDestroyBlock(Building *building, int blockPosition)
 void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
 {
     if (tile->building.blockCount >= 3) return;//should not happen
+
+    if (tile->building.isPorquet)
+    {
+        EmitSound(SoundWrong);//cannot build in porquet
+        return;
+    }
+
     if (materialType == Straw)
     {
         if(GetResource(WheatType) < cubeStrawWheatNeeded)
@@ -156,6 +170,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         ModifyResource(WheatType, -cubeStrawWheatNeeded);
         int index = tile->building.blockCount;
         tile->building.blocks[index].buildingMaterial = materialType;
+        tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blockCount++;
     }
     else if (materialType == Stick)
@@ -169,6 +184,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         ModifyResource(WoodType, -cubeStickWoodNeeded);
         int index = tile->building.blockCount;
         tile->building.blocks[index].buildingMaterial = materialType;
+        tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blockCount++;
     }
     else if (materialType == Brick)
@@ -182,6 +198,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         ModifyResource(ClayType, -cubeBrickClayNeeded);
         int index = tile->building.blockCount;
         tile->building.blocks[index].buildingMaterial = materialType;
+        tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blockCount++;
     }
 
@@ -189,9 +206,20 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
 
 void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
 {
+    if (weaponType == WEAPON_NONE) return; // should not happen
     if (cubeIndex > 2) return;
-    if (tile->building.blockCount <= cubeIndex) return;//should not happen
-    if (tile->building.blocks[cubeIndex].weaponType == weaponType) return;//should not happen
+
+    if (tile->building.blockCount <= cubeIndex)
+    {
+        EmitSound(SoundWrong);
+        return;
+    }
+
+    if (tile->building.blocks[cubeIndex].weaponType == weaponType)
+    {
+        EmitSound(SoundWrong);
+        return;
+    }
 
     if (weaponType == WeaponWeak)
     {
@@ -218,6 +246,63 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
     }
 }
 
+void BuildingSellBlock(Tile* tile, int blockIndex)
+{
+    if (blockIndex > 2) return;
+
+    if (tile->building.blockCount <= blockIndex)
+    {
+        EmitSound(SoundWrong);
+        return;
+    }
+
+    Block block = tile->building.blocks[blockIndex];
+    BuildingMaterial material = block.buildingMaterial;
+    WeaponType weaponType = block.weaponType;
+    bool isPorquet = tile->building.isPorquet;
+    BuildingDestroyBlock(&tile->building, blockIndex);
+
+    if (material == Straw)
+    {
+        ModifyMoney(sellStrawCubePrice);
+    }
+    else if (material == Stick)
+    {
+        ModifyMoney(sellStickCubePrice);
+    }
+    else if (material == Brick)
+    {
+        ModifyMoney(sellBrickCubePrice);
+    }
+
+    if (weaponType == WeaponWeak)
+    {
+        ModifyMoney(sellPriceWeakWeapon);
+    }
+    else if (weaponType == WeaponStrong)
+    {
+        ModifyMoney(sellPriceStrongWeapon);
+        ModifyResource(LavaType, sellIronReturnStrongWeapon);
+    }
+
+    if (isPorquet)
+    {
+        ModifyMoney(extraPorquetSellBonusMoney);
+        ModifyResource(WheatType, extraPorquetSellBonusWheat);
+        ModifyResource(WoodType, extraPorquetSellBonusWood);
+        ModifyResource(ClayType, extraPorquetSellBonusClay);
+    }
+
+}
+
+bool IsWholeSet(Tile* tile)
+{
+    if (tile->building.blockCount < 3) return false;
+    BuildingMaterial firstMaterialFound = tile->building.blocks[0].buildingMaterial;
+    if (tile->building.blocks[1].buildingMaterial != firstMaterialFound) return false;
+    if (tile->building.blocks[2].buildingMaterial != firstMaterialFound) return false;
+    return true;
+}
 
 void BuildingRelease()
 {

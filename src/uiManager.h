@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+enum WeaponType typedef WeaponType;
+
 struct RectangleSettings
 {
     Vector2 topLeftCorner;
@@ -16,8 +18,20 @@ void UiInit(int aScreenWidth, int aScreenHeight);
 void UiUpdate();
 void UiRender();
 void UiRelease();
-void UiShowTileButtons();
-void UiHideTileButtons();
+void UiShowRightSideButtons();
+void UiHideRightSideButtons();
+
+WeaponType WhichWeaponIsSelected();
+
+bool UiIsWeaponWeakButtonPressed();
+bool UiIsWeaponStrongButtonPressed();
+bool UiIsWeaponFloor1ButtonPressed();
+bool UiIsWeaponFloor2ButtonPressed();
+bool UiIsWeaponFloor3ButtonPressed();
+
+bool UiIsCubeStrawButtonPressed();
+bool UiIsCubeStickButtonPressed();
+bool UiIsCubeBrickButtonPressed();
 
 bool UiIsTileGrassButtonPressed();
 bool UiIsTileWheatButtonPressed();
@@ -25,11 +39,12 @@ bool UiIsTileWoodButtonPressed();
 bool UiIsTileClayButtonPressed();
 bool UiIsTileLavaButtonPressed();
 
-bool UiIsCubeStrawButtonPressed();
-bool UiIsCubeStickButtonPressed();
-bool UiIsCubeBrickButtonPressed();
-bool UiIsWeaponWeakButtonPressed();
-bool UiIsWeaponStrongButtonPressed();
+bool UiIsSellButtonPressed();
+bool UiIsSellFloor1Pressed();
+bool UiIsSellFloor2Pressed();
+bool UiIsSellFloor3Pressed();
+
+bool UiIsThunderboltPressed();
 
 //private
 void SetRectangleSettings(Rectangle *rectangle, RectangleSettings settings);
