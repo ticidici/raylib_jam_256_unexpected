@@ -3,6 +3,7 @@
 #include "terrain.h"
 #include <stdlib.h>
 #include "game_state.h"
+#include "sound.h"
 
 static Vector3 YAW = {0, 1.0f, 0};
 
@@ -165,6 +166,7 @@ bool DamageEnemy(Tile* tile, Enemy* enemy, int damage)
     {
         enemy->alive = false;
         tile->enemy = 0;
+        PlaySound(soundEnemyDeath);
         return true;
     }
     return false;
