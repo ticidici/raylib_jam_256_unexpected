@@ -14,6 +14,8 @@ extern Sound soundImpact;
 extern Sound soundEnemyDeath;
 extern Sound soundShot;
 extern Sound soundLose;
+extern Sound soundBreak;
+extern Sound soundBuild;
 
 void SoundInit();
 

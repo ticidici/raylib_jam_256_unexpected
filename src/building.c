@@ -159,6 +159,7 @@ void BuildingDestroyBlock(Building *building, int blockIndex)
     }
 
     building->blockCount -= 1;
+    PlaySound(soundBreak);
 }
 
 void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
@@ -185,6 +186,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blocks[index].hp = strawBlockHp;
         tile->building.blockCount++;
+        PlaySound(soundBuild);
     }
     else if (materialType == Stick)
     {
@@ -200,6 +202,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blocks[index].hp = stickBlockHp;
         tile->building.blockCount++;
+        PlaySound(soundBuild);
     }
     else if (materialType == Brick)
     {
@@ -215,6 +218,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blocks[index].hp = brickBlockHp;
         tile->building.blockCount++;
+        PlaySound(soundBuild);
     }
 
 }

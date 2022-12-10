@@ -6,6 +6,8 @@ Sound soundImpact;
 Sound soundEnemyDeath;
 Sound soundShot;
 Sound soundLose;
+Sound soundBreak;
+Sound soundBuild;
 
 static bool init = false;
 
@@ -18,6 +20,8 @@ void SoundInit() {
 	soundEnemyDeath = LoadSound("resources/enemy_death.mp3");
 	soundShot = LoadSound("resources/shot.mp3");
 	soundLose = LoadSound("resources/lose.mp3");
+	soundBreak = LoadSound("resources/break.mp3");
+	soundBuild = LoadSound("resources/build.mp3");
 }
 
 void SoundRelease() {
@@ -27,6 +31,8 @@ void SoundRelease() {
 	UnloadSound(soundEnemyDeath);
 	UnloadSound(soundShot);
 	UnloadSound(soundLose);
+	UnloadSound(soundBreak);
+	UnloadSound(soundBuild);
 	CloseAudioDevice();
 }
 
