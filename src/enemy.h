@@ -19,6 +19,7 @@ struct Enemy
    float rotationTarget;
    Model model;
    bool alive;
+   bool arrivedToTile;
 } typedef Enemy;
 
 // Public

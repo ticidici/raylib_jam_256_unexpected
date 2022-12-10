@@ -28,7 +28,7 @@ bool IsThunderboltUnlocked();
 bool IsLavaUnlocked();
 
 bool IsFastEnemyUnlocked();
-bool IsRangedEnemyUnlocked();
+bool IsStrongEnemyUnlocked();
 bool ShouldSpawnBoss();
 void SetBossSpawned();
 

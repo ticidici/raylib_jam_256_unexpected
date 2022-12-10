@@ -1,6 +1,7 @@
 #include "terrain.h"
 #include "utils.h"
 #include "uiManager.h"
+#include "enemy.h"
 #include "game_state.h"
 
 static Model tileSelector;
@@ -48,7 +49,7 @@ static float nextClayYield = 0;
 static float nextIronYield = 0;
 
 //lava special effect
-static float lavaHurtTime = 1;
+static float lavaBurnPeriod = 1;//every X seconds
 static float lavaDamage = 1;
 static float lavaStartExtendTime = 30;
 static float lavaFinishExtendTime = 45;
@@ -118,6 +119,9 @@ void TerrainInit()
                     {
                         battlefieldTiles[i][j].tileModel = lavaTile;
                         battlefieldTiles[i][j].tileType = LavaType;
+                        battlefieldTiles[i][j].lavaNextExtendStart = 0 + lavaStartExtendTime;
+                        battlefieldTiles[i][j].lavaNextExtendFinish = 0 + lavaFinishExtendTime;
+                        battlefieldTiles[i][j].lavaAboutToExtend = false;
                     }
                     else if (randomValue < 20)
                     {
@@ -355,7 +359,7 @@ void TerrainUpdate()
         showHoveredTileInfo = !showHoveredTileInfo;
     }
 
-    CalculateTilesYield();
+    CalculateTileEffects();
 }
 
 void TerrainRender()
@@ -369,7 +373,9 @@ void TerrainRender()
         {
             Tile *tile = &battlefieldTiles[i][j];
             BuildingRender(&tile->building, tile->position);
-            DrawModel(battlefieldTiles[i][j].tileModel, battlefieldTiles[i][j].position, 1.f, WHITE);
+            Color color = WHITE;
+            if (tile->tileType == LavaType && tile->lavaAboutToExtend) color = RED;
+            DrawModel(battlefieldTiles[i][j].tileModel, battlefieldTiles[i][j].position, 1.f, color);
         }
     }
 
@@ -427,6 +433,20 @@ bool ShouldShowTileInfo()
     return showHoveredTileInfo;
 }
 
+void EnemySteppedOnLava(Enemy* enemy, Tile* tile)
+{
+    enemy->hp -= lavaDamage;
+    if (enemy->hp <= 0)
+    {
+        enemy->alive = false;
+        tile->enemy = 0;
+    }
+    else
+    {
+        tile->lavaNextBurn = GetRunTime() + lavaBurnPeriod;
+    }
+}
+
 void TerrainBuyTile(TileType tileType, Tile *tile)
 {
     if (tileType == tile->tileType) return;
@@ -453,6 +473,9 @@ void TerrainBuyTile(TileType tileType, Tile *tile)
             ModifyMoney(-lavaPrice);
 
             tile->tileModel = lavaTile;
+            tile->lavaNextExtendStart = GetRunTime() + lavaStartExtendTime;
+            tile->lavaNextExtendFinish = GetRunTime() + lavaFinishExtendTime;
+            tile->lavaAboutToExtend = false;
             break;
     
         case WheatType:
@@ -479,7 +502,7 @@ void TerrainBuyTile(TileType tileType, Tile *tile)
     tile->tileType = tileType;
 }
 
-void CalculateTilesYield()
+void CalculateTileEffects()
 {
     float runTime = GetRunTime();
 
@@ -515,7 +538,7 @@ void CalculateTilesYield()
         yieldIron = true;
     }
 
-    if (!yieldMoney && !yieldWheat && !yieldWood && !yieldClay && !yieldIron) return;
+    //if (!yieldMoney && !yieldWheat && !yieldWood && !yieldClay && !yieldIron) return;
 
     for (int i = 0; i < BATTLEFIELD_SIZE; i++)
     {
@@ -556,10 +579,38 @@ void CalculateTilesYield()
                 if (IsWholeSet(candidateTile)) ModifyResource(ClayType, wholeSetBonusResourceYield);
             }
         
-            if (yieldIron && candidateTile->tileType == LavaType)
+            if (candidateTile->tileType == LavaType)
             {
-                ModifyResource(LavaType, 1);
-                if (IsWholeSet(candidateTile)) ModifyResource(LavaType, wholeSetBonusResourceYield);
+                if (yieldIron)
+                {
+                    ModifyResource(LavaType, 1);
+                    if (IsWholeSet(candidateTile)) ModifyResource(LavaType, wholeSetBonusResourceYield);
+                }
+
+                //if (runTime >= candidateTile->lavaNextExtendStart)
+                //{
+                //    candidateTile->lavaNextExtendStart = candidateTile->lavaNextExtendFinish + lavaStartExtendTime;
+                //    candidateTile->lavaAboutToExtend = true;
+                //}
+                //
+                //if (runTime >= candidateTile->lavaNextExtendFinish)
+                //{
+                //    candidateTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
+                //    int x = candidateTile->coordX;
+                //    int y = candidateTile->coordY;
+                //    Vector2 surroundingTiles[8] = { (Vector2) {-1, -1}, (Vector2) { -1, 1 ...} }
+                //    GetRandomValue(1, 8);
+                //    for (int surroundingTileIdx = 0; surroundingTileIdx < 8; surroundingTileIdx++)
+                //    {
+                //
+                //    }
+                //
+                //}
+                
+                if (candidateTile->enemy != 0 && runTime >= candidateTile->lavaNextBurn)
+                {
+                    EnemySteppedOnLava(candidateTile->enemy, candidateTile);
+                }
             }
         }
     }

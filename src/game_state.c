@@ -25,7 +25,7 @@ static Vector2 thunderboltDamage = { 999, 20 };//tile, adjacent
 static float lavaUnlockTime = 300;
 static float thunderboltUnlockTime = 420;
 static float fastEnemyUnlockTime = 180;
-static float rangedEnemyUnlockTime = 400;
+static float strongEnemyUnlockTime = 400;
 
 static bool bossSpawned = false;
 static float bossSpawnTime = 900;
@@ -208,9 +208,9 @@ bool IsFastEnemyUnlocked()
 	return false;
 }
 
-bool IsRangedEnemyUnlocked()
+bool IsStrongEnemyUnlocked()
 {
-	if (runTimePassed >= rangedEnemyUnlockTime)
+	if (runTimePassed >= strongEnemyUnlockTime)
 		return true;
 	return false;
 }

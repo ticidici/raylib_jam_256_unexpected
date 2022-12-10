@@ -34,6 +34,12 @@ struct Tile
     int coordX;
     int coordY;
     Enemy *enemy;
+
+    //lava specifics
+    float lavaNextBurn;
+    float lavaNextExtendStart;
+    float lavaNextExtendFinish;
+    bool lavaAboutToExtend;
 } typedef Tile;
 
 // Public
@@ -50,9 +56,11 @@ Tile *TerrainGetTile(int x, int y);
 void TerrainBuyTile(TileType tileType, Tile *tile);
 bool ShouldShowTileInfo();
 
+void EnemySteppedOnLava(Enemy* enemy, Tile* tile);
+
 // Private
 void DrawGridCentered(float tileSpacing, int tileCount);
 void UpdateTileSelector();
-void CalculateTilesYield();
+void CalculateTileEffects();
 
 #endif

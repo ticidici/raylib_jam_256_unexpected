@@ -5,8 +5,8 @@
 
 static Vector3 YAW = {0, 1.0f, 0};
 
-#define ENEMY_ATTACK_COLDOWN 2
-#define ENEMY_MOVEMENT_COLDOWN 2
+#define ENEMY_ATTACK_COLDOWN 3
+#define ENEMY_MOVEMENT_COLDOWN 3
 #define ENEMY_MOVEMENT_SPEED 7.0f
 #define ENEMY_ROTATION_SPEED (ENEMY_MOVEMENT_SPEED * 45.0f)
 
@@ -87,46 +87,60 @@ void EnemyUpdateOne(Enemy *enemy)
         float x = ((TILE_HALF_WIDTH * 2) - tileDistance) / (TILE_HALF_WIDTH * 2);
         enemy->position.y = (1 - (x * x - x + 1)) * 6.0f;
     }
-    else if (target != 0)
-    {
-        // Attack
-        int dirX, dirY;
-        EnemyGetTargetDir(enemy, target->coordX, target->coordY, &dirX, &dirY);
-        enemy->rotationTarget = EnemyGetTargetRotation(dirX, dirY);
-
-        if (now - enemy->lastAttackTime >= ENEMY_ATTACK_COLDOWN)
-        {
-            enemy->lastAttackTime = now;
-            enemy->lastMoveTime = now;
-            BuildingDestroyBlock(&target->building, 0);
-        }
-    }
     else
     {
-        // Find center
-        if (now - enemy->lastMoveTime > ENEMY_MOVEMENT_COLDOWN)
+        if (!enemy->arrivedToTile)
         {
-            enemy->lastAttackTime = now;
-            enemy->lastMoveTime = now;
+            enemy->arrivedToTile = true;
+            if (tile->tileType == LavaType)
+            {
+                EnemySteppedOnLava(enemy, tile);
+            }
+        }
 
+        if (target != 0)
+        {
+            // Attack
             int dirX, dirY;
-            EnemyGetTargetDir(enemy, MIDDLE_TILE_INDEX, MIDDLE_TILE_INDEX, &dirX, &dirY);
+            EnemyGetTargetDir(enemy, target->coordX, target->coordY, &dirX, &dirY);
             enemy->rotationTarget = EnemyGetTargetRotation(dirX, dirY);
 
-            int nextX = enemy->x + dirX;
-            int nextY = enemy->y + dirY;
-
-            Tile *nextTile = TerrainGetTile(nextX, nextY);
-            if (nextTile->enemy)
+            if (now - enemy->lastAttackTime >= ENEMY_ATTACK_COLDOWN)
             {
-                // Tile already has an enemy, wait for his moves
+                enemy->lastAttackTime = now;
+                enemy->lastMoveTime = now;
+                BuildingDestroyBlock(&target->building, 0);
             }
-            else
+        }
+        else
+        {
+
+            // Find center
+            if (now - enemy->lastMoveTime > ENEMY_MOVEMENT_COLDOWN)
             {
-                tile->enemy = 0;
-                enemy->x = nextX;
-                enemy->y = nextY;
-                nextTile->enemy = enemy;
+                enemy->lastAttackTime = now;
+                enemy->lastMoveTime = now;
+
+                int dirX, dirY;
+                EnemyGetTargetDir(enemy, MIDDLE_TILE_INDEX, MIDDLE_TILE_INDEX, &dirX, &dirY);
+                enemy->rotationTarget = EnemyGetTargetRotation(dirX, dirY);
+
+                int nextX = enemy->x + dirX;
+                int nextY = enemy->y + dirY;
+
+                Tile *nextTile = TerrainGetTile(nextX, nextY);
+                if (nextTile->enemy)
+                {
+                    // Tile already has an enemy, wait for his moves
+                }
+                else
+                {
+                    tile->enemy = 0;
+                    enemy->x = nextX;
+                    enemy->y = nextY;
+                    nextTile->enemy = enemy;
+                    enemy->arrivedToTile = false;
+                }
             }
         }
     }
