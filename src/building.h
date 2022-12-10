@@ -47,6 +47,19 @@ extern int cubeStrawWheatNeeded;
 extern int cubeStickWoodNeeded;
 extern int cubeBrickClayNeeded;
 
+extern int sellPriceWeakWeapon;
+extern int sellPriceStrongWeapon;
+extern int sellIronReturnStrongWeapon;
+
+extern int sellStrawCubePrice;
+extern int sellStickCubePrice;
+extern int sellBrickCubePrice;
+
+extern int extraPorquetSellBonusMoney;
+extern int extraPorquetSellBonusWheat;
+extern int extraPorquetSellBonusWood;
+extern int extraPorquetSellBonusClay;
+
 void BuildingInit();
 
 void BuildingUpdate(Building *building, Vector3 position);

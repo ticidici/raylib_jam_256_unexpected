@@ -16,10 +16,10 @@ static float wood = 10;
 static float clay = 10;
 static float iron = 0;
 
-static float lavaUnlockTime = 300;
-static float thunderboltUnlockTime = 420;
-static float fastEnemyUnlockTime = 180;
-static float strongEnemyUnlockTime = 400;
+static float lavaUnlockTime = 300;//300
+static float thunderboltUnlockTime = 420;//420
+static float fastEnemyUnlockTime = 180;//180
+static float strongEnemyUnlockTime = 400;//400
 
 static bool bossSpawned = false;
 static float bossSpawnTime = 900;
@@ -59,6 +59,7 @@ void GameStateUpdate()
 
 	if (state == GameOver && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 		state = Start;
+		runsFinished++;
 	}
 
 	if ((state == Running || state == Paused) && (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P)))

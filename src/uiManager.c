@@ -2,6 +2,7 @@
 #include "terrain.h"
 #include "camera.h"
 #include "game_state.h"
+#include "sound.h"
 #include "enemy.h"
 #include "raymath.h"
 
@@ -374,6 +375,14 @@ void UiUpdate()
 
     if (state != Running) return;
 
+    if (GetRunTime() == 0) return;
+
+    //in case it is already opened when the unlock takes place
+    if (IsLavaUnlocked() && tileButtonsContainerSettings.isEnabled)
+    {
+        lavaButtonSettings.isEnabled = true;
+        weaponStrongButtonSettings.isEnabled = true;
+    }
 	//things like size and positioning or movement of ui
     //Toggle UI
     if (IsKeyPressed(KEY_U) || (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE) && !IsCamIsometric()))
@@ -555,7 +564,7 @@ void UiRender()
         DrawTextureEx(brickIcon, (Vector2) { 156.0f, 4.0f }, 0, 1, WHITE);
         DrawText(TextFormat("%03i", GetResource(ClayType)), 175, 6, 14, RAYWHITE);
 
-        //if (IsLavaUnlocked())
+        if (IsLavaUnlocked())
         {
             DrawTextureEx(ironIcon, (Vector2) { 206.0f, 4.0f }, 0, 1, WHITE);
             DrawText(TextFormat("%03i", GetResource(LavaType)), 225, 6, 14, RAYWHITE);
@@ -757,7 +766,7 @@ void UiRender()
         }
         // -------------- /Tile Info ----------------------
         //tunderbolt
-        //if (IsThunderboltUnlocked())
+        if (IsThunderboltUnlocked())
         {
             DrawRectangle(thunderboltContainerSettings.topLeftCorner.x,
             thunderboltContainerSettings.topLeftCorner.y,
@@ -983,24 +992,151 @@ void UiRender()
     }
     //----------- /buttons right side -----------
 
+    //----------- sell prices -------------------
+    if (!hideUI)
+    {
+        const char* priceText = 0;
 
-    const char* priceText = 0;
-
-    if (hoveredButton == &weaponBlock3Button || hoveredButton == &weaponBlock2Button || hoveredButton == &weaponBlock1Button) {
-        if (WhichWeaponIsSelected() == WeaponStrong) {
-            priceText = TextFormat("-%d gold -%d iron", weaponStrongPrice, weaponStrongIronNeeded);
+        if (hoveredButton == &weaponBlock3Button || hoveredButton == &weaponBlock2Button || hoveredButton == &weaponBlock1Button) {
+            if (WhichWeaponIsSelected() == WeaponStrong) {
+                priceText = TextFormat("-%d gold -%d iron", weaponStrongPrice, weaponStrongIronNeeded);
+            }
+            else if (WhichWeaponIsSelected() == WeaponWeak) {
+                priceText = TextFormat("-%d gold", weaponWeakPrice);
+            }
         }
-        else if (WhichWeaponIsSelected() == WeaponWeak) {
+        else if (hoveredButton == &weaponWeakButton)
+        {
             priceText = TextFormat("-%d gold", weaponWeakPrice);
         }
-    }
-    else if (hoveredButton == &grassButton) {
-        //priceText = TextFormat("-%d gold", grass);
-    }
+        else if (hoveredButton == &weaponStrongButton)
+        {
+            priceText = TextFormat("-%d gold -%d iron", weaponStrongPrice, weaponStrongIronNeeded);
+        }
+        else if (hoveredButton == &grassButton)
+        {
+            priceText = TextFormat("-%d gold", grassPrice);
+        }
+        else if (hoveredButton == &wheatButton)
+        {
+            priceText = TextFormat("-%d gold", wheatPrice);
+        }
+        else if (hoveredButton == &woodButton)
+        {
+            priceText = TextFormat("-%d gold", woodPrice);
+        }
+        else if (hoveredButton == &clayButton)
+        {
+            priceText = TextFormat("-%d gold", clayPrice);
+        }
+        else if (hoveredButton == &lavaButton)
+        {
+            priceText = TextFormat("-%d gold", lavaPrice);
+        }
+        else if (hoveredButton == &cubeStrawButton)
+        {
+            priceText = TextFormat("-%d wheat", cubeStrawWheatNeeded);
+        }
+        else if (hoveredButton == &cubeStickButton)
+        {
+            priceText = TextFormat("-%d wood", cubeStickWoodNeeded);
+        }
+        else if (hoveredButton == &cubeBrickButton)
+        {
+            priceText = TextFormat("-%d clay", cubeBrickClayNeeded);
+        }
+        else if (hoveredButton == &sellBlock1Button || hoveredButton == &sellBlock2Button || hoveredButton == &sellBlock3Button)
+        {
+            Tile* tile = TerrainGetTileSelected();
+            int blockIndex = 0;
+            if (hoveredButton == &sellBlock2Button)
+            {
+                blockIndex = 1;
+            }
+            else if (hoveredButton == &sellBlock3Button)
+            {
+                blockIndex = 2;
+            }
 
-    if (priceText) {
-        DrawText(priceText, thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y, 16, RAYWHITE);
+            if (blockIndex >= tile->building.blockCount)
+            {
+                priceText = "no block to sell";
+            }
+            else
+            {
+                Block block = tile->building.blocks[blockIndex];
+                BuildingMaterial material = block.buildingMaterial;
+                WeaponType weaponType = block.weaponType;
+                bool isPorquet = tile->building.isPorquet;
+
+                int money = 0;
+                int wheat = 0;
+                int wood = 0;
+                int clay = 0;
+                int iron = 0;
+
+                if (material == Straw)
+                {
+                    money += sellStrawCubePrice;
+                }
+                else if (material == Stick)
+                {
+                    money += sellStickCubePrice;
+                }
+                else if (material == Brick)
+                {
+                    money += sellBrickCubePrice;
+                }
+
+                if (weaponType == WeaponWeak)
+                {
+                    money += sellPriceWeakWeapon;
+                }
+                else if (weaponType == WeaponStrong)
+                {
+                    money += sellPriceStrongWeapon;
+                    iron += sellIronReturnStrongWeapon;
+                }
+
+                if (isPorquet)
+                {
+                    money += extraPorquetSellBonusMoney;
+                    wheat += extraPorquetSellBonusWheat;
+                    wood = extraPorquetSellBonusWood;
+                    clay += extraPorquetSellBonusClay;
+
+                }
+
+                if (weaponType == WeaponStrong || isPorquet)
+                {
+                    priceText = TextFormat("+%d money + resources", money);
+                }
+                else
+                {
+                    priceText = TextFormat("+%d money", money);
+                }
+
+                
+            }
+        }
+
+        if (priceText) {
+            DrawText(priceText, thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y, 16, RAYWHITE);
+
+            if (hoveredButton == &grassButton) DrawText("no yield", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 16, 16, RAYWHITE);
+            else if (hoveredButton == &wheatButton) DrawText("yields wheat", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 16, 16, RAYWHITE);
+            else if (hoveredButton == &woodButton) DrawText("yields wood", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 16, 16, RAYWHITE);
+            else if (hoveredButton == &clayButton) DrawText("yields clay", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 16, 16, RAYWHITE);
+            else if (hoveredButton == &lavaButton)
+            {
+                DrawText("yields iron", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 16, 16, RAYWHITE);
+                DrawText("burns", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 32, 16, RAYWHITE);
+                DrawText("extends", thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y + 48, 16, RAYWHITE);
+            }
+
+        }
     }
+    
 
     // Timer
     int timeInSeconds = floorf(GetRunTime());
@@ -1053,7 +1189,7 @@ void UiShowRightSideButtons()
     weaponsFloorContainerSettings.isEnabled = false;
 
     weaponWeakButtonSettings.isEnabled = true;
-    /*if (IsLavaUnlocked()) */weaponStrongButtonSettings.isEnabled = true;
+    if (IsLavaUnlocked()) weaponStrongButtonSettings.isEnabled = true;
 
     cubeStrawButtonSettings.isEnabled = true;
     cubeStickButtonSettings.isEnabled = true;
@@ -1063,7 +1199,7 @@ void UiShowRightSideButtons()
     wheatButtonSettings.isEnabled = true;
     woodButtonSettings.isEnabled = true;
     clayButtonSettings.isEnabled = true;
-    /*if (IsLavaUnlocked()) */lavaButtonSettings.isEnabled = true;
+    if (IsLavaUnlocked()) lavaButtonSettings.isEnabled = true;
 
     sellButtonSettings.isEnabled = true;
 

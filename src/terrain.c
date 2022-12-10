@@ -24,11 +24,11 @@ static Tile battlefieldTiles[BATTLEFIELD_SIZE][BATTLEFIELD_SIZE] = {0};
 bool showHoveredTileInfo = false;
 
 //tile price
-static int grassPrice = 1;//only useful to stop lava
-static int wheatPrice = 2;
-static int woodPrice = 5;
-static int clayPrice = 11;
-static int lavaPrice = 11;
+int grassPrice = 1;//only useful to stop lava
+int wheatPrice = 2;
+int woodPrice = 5;
+int clayPrice = 11;
+int lavaPrice = 11;
 
 //time tile needs to give resources
 static int moneyYieldQuantity = 1;
@@ -122,7 +122,7 @@ void TerrainInit()
                 int randomValue = GetRandomValue(0, 100);
                 if ((i >= FORTRESS_FIRST_TILE_INDEX && i <= FORTRESS_LAST_TILE_INDEX) && (j >= FORTRESS_FIRST_TILE_INDEX && j <= FORTRESS_LAST_TILE_INDEX))
                 {
-                    if (randomValue < 10)
+                    if (randomValue < 10 && IsLavaUnlocked())
                     {
                         battlefieldTiles[i][j].tileModel = lavaTile;
                         battlefieldTiles[i][j].tileType = LavaType;
@@ -206,6 +206,8 @@ void TerrainRelease()
 
 void TerrainUpdate()
 {
+    if (GetRunTime() == 0) return;
+
     bool tileJustDeselected = false;
     bool clickedInButton = false;
     if (isTileSelected)

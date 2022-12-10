@@ -31,18 +31,18 @@ int cubeStrawWheatNeeded = 10;
 int cubeStickWoodNeeded = 10;
 int cubeBrickClayNeeded = 10;
 
-static int sellPriceWeakWeapon = 2;
-static int sellPriceStrongWeapon = 7;
-static int sellIronReturnStrongWeapon = 1;
+int sellPriceWeakWeapon = 2;
+int sellPriceStrongWeapon = 7;
+int sellIronReturnStrongWeapon = 1;
 
-static int sellStrawCubePrice = 3;
-static int sellStickCubePrice = 7;
-static int sellBrickCubePrice = 13;
+int sellStrawCubePrice = 3;
+int sellStickCubePrice = 7;
+int sellBrickCubePrice = 13;
 
-static int extraPorquetSellBonusMoney = 50;
-static int extraPorquetSellBonusWheat = 5;
-static int extraPorquetSellBonusWood = 5;
-static int extraPorquetSellBonusClay = 10;
+int extraPorquetSellBonusMoney = 50;
+int extraPorquetSellBonusWheat = 5;
+int extraPorquetSellBonusWood = 5;
+int extraPorquetSellBonusClay = 10;
 
 static int porquetBlocksHp = 50;
 static int strawBlockHp = 10;
@@ -311,7 +311,6 @@ void BuildingSellBlock(Tile* tile, int blockIndex)
         ModifyResource(WoodType, extraPorquetSellBonusWood);
         ModifyResource(ClayType, extraPorquetSellBonusClay);
     }
-
 }
 
 bool IsWholeSet(Tile* tile)

@@ -42,6 +42,12 @@ struct Tile
     bool lavaAboutToExtend;
 } typedef Tile;
 
+extern int grassPrice;
+extern int wheatPrice;
+extern int woodPrice;
+extern int clayPrice;
+extern int lavaPrice;
+
 // Public
 void TerrainInit();
 
