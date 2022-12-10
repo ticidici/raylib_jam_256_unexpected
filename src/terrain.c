@@ -53,6 +53,7 @@ static float lavaBurnPeriod = 1;//every X seconds
 static float lavaDamage = 1;
 static float lavaStartExtendTime = 30;
 static float lavaFinishExtendTime = 45;
+static Color lavaAboutToExtendColor = { 255, 160, 160, 255};
 
 //resources exchange rate
 static Vector2 wheatWoodRate = { 3, 1 };//give X, receive Y
@@ -374,7 +375,7 @@ void TerrainRender()
             Tile *tile = &battlefieldTiles[i][j];
             BuildingRender(&tile->building, tile->position);
             Color color = WHITE;
-            if (tile->tileType == LavaType && tile->lavaAboutToExtend) color = RED;
+            if (tile->tileType == LavaType && tile->lavaAboutToExtend) color = lavaAboutToExtendColor;
             DrawModel(battlefieldTiles[i][j].tileModel, battlefieldTiles[i][j].position, 1.f, color);
         }
     }
@@ -587,25 +588,49 @@ void CalculateTileEffects()
                     if (IsWholeSet(candidateTile)) ModifyResource(LavaType, wholeSetBonusResourceYield);
                 }
 
-                //if (runTime >= candidateTile->lavaNextExtendStart)
-                //{
-                //    candidateTile->lavaNextExtendStart = candidateTile->lavaNextExtendFinish + lavaStartExtendTime;
-                //    candidateTile->lavaAboutToExtend = true;
-                //}
-                //
-                //if (runTime >= candidateTile->lavaNextExtendFinish)
-                //{
-                //    candidateTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
-                //    int x = candidateTile->coordX;
-                //    int y = candidateTile->coordY;
-                //    Vector2 surroundingTiles[8] = { (Vector2) {-1, -1}, (Vector2) { -1, 1 ...} }
-                //    GetRandomValue(1, 8);
-                //    for (int surroundingTileIdx = 0; surroundingTileIdx < 8; surroundingTileIdx++)
-                //    {
-                //
-                //    }
-                //
-                //}
+                if (runTime >= candidateTile->lavaNextExtendStart)
+                {
+                    candidateTile->lavaNextExtendStart = candidateTile->lavaNextExtendFinish + lavaStartExtendTime;
+                    candidateTile->lavaAboutToExtend = true;
+                }
+                
+                if (runTime >= candidateTile->lavaNextExtendFinish)
+                {
+                    candidateTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
+                    candidateTile->lavaAboutToExtend = false;
+
+                    int lavaCoordX = candidateTile->coordX;
+                    int lavaCoordY = candidateTile->coordY;
+
+                    //Vector2 surroundingTiles[8] = { (Vector2) { -1, 1 },    (Vector2) { 0, 1 },     (Vector2) { 1, 1 }, 
+                    //                                (Vector2) { -1, 0 },                            (Vector2) { 1, 0 }, 
+                    //                                (Vector2) { -1, -1 },   (Vector2) { 0, -1 },    (Vector2) { 1, -1 } };
+                    
+                    Vector2 surroundingTiles[4] = {                         (Vector2) { 0, 1 },      
+                                                    (Vector2) { -1, 0 },                            (Vector2) { 1, 0 }, 
+                                                                            (Vector2) { 0, -1 },                      };
+
+                    int indexOffset = GetRandomValue(0, 4);
+                    for (int indexNoOffset = 0; indexNoOffset < 4; indexNoOffset++)
+                    {
+                        int surroundingTileIdx = (indexNoOffset + indexOffset) % 4;
+                        Vector2 coordOffset = surroundingTiles[surroundingTileIdx];
+                        Vector2 surroundingTileCoordinates = { lavaCoordX + coordOffset.x, lavaCoordY + coordOffset.y };
+                        Tile* surroundingTile = TerrainGetTile(surroundingTileCoordinates.x, surroundingTileCoordinates.y);
+
+                        if (surroundingTile->tileType == DirtType || surroundingTile->tileType == LavaType) continue;
+                        if (surroundingTile->building.isPorquet) continue;//don't lava porquet's butt
+
+                        surroundingTile->tileType = LavaType;
+                        surroundingTile->tileModel = lavaTile;
+                        surroundingTile->lavaAboutToExtend = false;
+                        surroundingTile->lavaNextExtendStart = runTime + lavaStartExtendTime;
+                        surroundingTile->lavaNextExtendFinish = runTime + lavaFinishExtendTime;
+                        if (surroundingTile->enemy != 0) EnemySteppedOnLava(surroundingTile->enemy, surroundingTile);
+                        break;
+                    }
+                
+                }
                 
                 if (candidateTile->enemy != 0 && runTime >= candidateTile->lavaNextBurn)
                 {
