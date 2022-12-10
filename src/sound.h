@@ -13,6 +13,7 @@ extern Sound waveSound;
 extern Sound soundImpact;
 extern Sound soundEnemyDeath;
 extern Sound soundShot;
+extern Sound soundLose;
 
 void SoundInit();
 

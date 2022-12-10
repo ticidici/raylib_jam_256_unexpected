@@ -5,6 +5,7 @@ Sound waveSound;
 Sound soundImpact;
 Sound soundEnemyDeath;
 Sound soundShot;
+Sound soundLose;
 
 static bool init = false;
 
@@ -16,6 +17,7 @@ void SoundInit() {
 	soundImpact = LoadSound("resources/impact.mp3");
 	soundEnemyDeath = LoadSound("resources/enemy_death.mp3");
 	soundShot = LoadSound("resources/shot.mp3");
+	soundLose = LoadSound("resources/lose.mp3");
 }
 
 void SoundRelease() {
@@ -24,6 +26,7 @@ void SoundRelease() {
 	UnloadSound(soundImpact);
 	UnloadSound(soundEnemyDeath);
 	UnloadSound(soundShot);
+	UnloadSound(soundLose);
 	CloseAudioDevice();
 }
 

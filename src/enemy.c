@@ -101,6 +101,7 @@ void EnemyUpdateOne(Enemy *enemy)
             if (enemy->x == MIDDLE_TILE_INDEX && enemy->y == MIDDLE_TILE_INDEX) {
                 // Enemy placed on center, enemy won
                 state = GameOver;
+                PlaySound(soundLose);
             }
         }
 
