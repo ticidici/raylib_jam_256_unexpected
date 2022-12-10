@@ -3,6 +3,7 @@
 #include "uiManager.h"
 #include "enemy.h"
 #include "game_state.h"
+#include "sound.h"
 
 static Model tileSelector;
 static Model grassTile;
@@ -506,19 +507,27 @@ bool IsThunderboltReady()
 
 void TerrainBuyTile(TileType tileType, Tile *tile)
 {
-    if (tileType == tile->tileType) return;
+    if (tileType == tile->tileType)
+    {
+        PlaySound(soundForbidden);
+        return;
+    }
 
     if (tile->coordX < FORTRESS_FIRST_TILE_INDEX || tile->coordX > FORTRESS_LAST_TILE_INDEX
         || tile->coordY < FORTRESS_FIRST_TILE_INDEX || tile->coordY > FORTRESS_LAST_TILE_INDEX)
     {
-        //TODO throw sound or message
+        PlaySound(soundForbidden);
         return;
     }
 
     switch (tileType)
     {
         case GrassType:
-            if (GetMoney() < grassPrice) return;
+            if (GetMoney() < grassPrice)
+            {
+                PlaySound(soundForbidden);
+                return;
+            }
             ModifyMoney(-grassPrice);
 
             if(GetRandomValue(0, 100) < 50) tile->tileModel = grassTile;
@@ -526,7 +535,11 @@ void TerrainBuyTile(TileType tileType, Tile *tile)
             break;
 
         case LavaType:
-            if (GetMoney() < lavaPrice) return;
+            if (GetMoney() < lavaPrice)
+            {
+                PlaySound(soundForbidden);
+                return;
+            }
             ModifyMoney(-lavaPrice);
 
             tile->tileModel = lavaTile;
@@ -536,21 +549,33 @@ void TerrainBuyTile(TileType tileType, Tile *tile)
             break;
     
         case WheatType:
-            if (GetMoney() < wheatPrice) return;
+            if (GetMoney() < wheatPrice) 
+            {
+                PlaySound(soundForbidden);
+                return;
+            }
             ModifyMoney(-wheatPrice);
 
             tile->tileModel = wheatTile;
             break;
     
         case WoodType:
-            if (GetMoney() < woodPrice) return;
+            if (GetMoney() < woodPrice)
+            {
+                PlaySound(soundForbidden);
+                return;
+            }
             ModifyMoney(-woodPrice);
 
             tile->tileModel = woodTile;
             break;
     
         case ClayType:
-            if (GetMoney() < clayPrice) return;
+            if (GetMoney() < clayPrice) 
+            {
+                PlaySound(soundForbidden);
+                return;
+            }
             ModifyMoney(-clayPrice);
 
             tile->tileModel = clayTile;
@@ -704,6 +729,8 @@ void CalculateTileEffects()
 
 void PerformThunderbolt()
 {
+    PlaySound(soundThunderbolt);
+
     nextThunderboltActiveTime = GetRunTime() + thunderboltCooldown;
     nextThunderboltStop = GetRunTime() + thunderboltDuration;
 

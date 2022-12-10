@@ -14,7 +14,7 @@ struct RectangleSettings
     bool isEnabled;
 } typedef RectangleSettings;
 
-void UiInit(int aScreenWidth, int aScreenHeight);
+void UiInit();
 void UiUpdate();
 void UiRender();
 void UiRelease();

@@ -34,7 +34,7 @@ void GameStateInit()
 	state = Start;
 
 	runTimePassed = 0;
-	money = 11;
+	money = 5;
 	wheat = 10;
 	wood = 10;
 	clay = 10;

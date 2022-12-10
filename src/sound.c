@@ -8,6 +8,8 @@ Sound soundShot;
 Sound soundLose;
 Sound soundBreak;
 Sound soundBuild;
+Sound soundThunderbolt;
+Sound soundForbidden;
 
 static bool init = false;
 
@@ -22,6 +24,8 @@ void SoundInit() {
 	soundLose = LoadSound("resources/lose.mp3");
 	soundBreak = LoadSound("resources/break.mp3");
 	soundBuild = LoadSound("resources/build.mp3");
+	soundThunderbolt = LoadSound("resources/thunderbolt.mp3");
+	soundForbidden = LoadSound("resources/forbidden.mp3");
 }
 
 void SoundRelease() {
@@ -33,6 +37,8 @@ void SoundRelease() {
 	UnloadSound(soundLose);
 	UnloadSound(soundBreak);
 	UnloadSound(soundBuild);
+	UnloadSound(soundThunderbolt);
+	UnloadSound(soundForbidden);
 	CloseAudioDevice();
 }
 

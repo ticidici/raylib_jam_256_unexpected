@@ -16,6 +16,8 @@ extern Sound soundShot;
 extern Sound soundLose;
 extern Sound soundBreak;
 extern Sound soundBuild;
+extern Sound soundThunderbolt;
+extern Sound soundForbidden;
 
 void SoundInit();
 

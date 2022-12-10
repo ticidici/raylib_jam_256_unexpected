@@ -35,7 +35,7 @@ void Init()
 
     CameraInit();
 
-    UiInit(screenWidth, screenHeight);
+    UiInit();
 
     TerrainInit();
     BuildingInit();

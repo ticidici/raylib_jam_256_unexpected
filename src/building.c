@@ -8,7 +8,7 @@
 
 #define BLOCK_HEIGHT 2.0f
 #define BLOCK_FALL_SPEED 6.0f
-#define BLOCK_ATTACK_COLDOWN 1.0f
+#define BLOCK_ATTACK_COLDOWN 1.1f
 #define BLOCK_ROTATION_SPEED 720.0f
 
 static Model pig;
@@ -195,11 +195,15 @@ void BuildingDestroyBlock(Building *building, int blockIndex)
 
 void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
 {
-    if (tile->building.blockCount >= 3) return;//should not happen
+    if (tile->building.blockCount >= 3)
+    {
+        PlaySound(soundForbidden);
+        return;
+    }
 
     if (tile->building.isPorquet)
     {
-        EmitSound(SoundWrong);//cannot build in porquet
+        PlaySound(soundForbidden);//cannot build in porquet
         return;
     }
 
@@ -207,7 +211,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
     {
         if(GetResource(WheatType) < cubeStrawWheatNeeded)
         {
-            EmitSound(SoundWrong);
+            PlaySound(soundForbidden);
             return;
         }
 
@@ -223,7 +227,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
     {
         if (GetResource(WoodType) < cubeStickWoodNeeded)
         {
-            EmitSound(SoundWrong);
+            PlaySound(soundForbidden);
             return;
         }
 
@@ -239,7 +243,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
     {
         if (GetResource(ClayType) < cubeBrickClayNeeded)
         {
-            EmitSound(SoundWrong);
+            PlaySound(soundForbidden);
             return;
         }
 
@@ -261,13 +265,13 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
 
     if (tile->building.blockCount <= cubeIndex)
     {
-        EmitSound(SoundWrong);
+        PlaySound(soundForbidden);
         return;
     }
 
     if (tile->building.blocks[cubeIndex].weaponType == weaponType)
     {
-        EmitSound(SoundWrong);
+        PlaySound(soundForbidden);
         return;
     }
 
@@ -275,7 +279,7 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
     {
         if (GetMoney() < weaponWeakPrice)
         {
-            EmitSound(SoundWrong);
+            PlaySound(soundForbidden);
             return;
         }
 
@@ -286,7 +290,7 @@ void BuildingBuyWeapon(WeaponType weaponType, Tile* tile, int cubeIndex)
     {
         if (GetResource(LavaType) < weaponStrongIronNeeded || GetMoney() < weaponStrongPrice)
         {
-            EmitSound(SoundWrong);
+            PlaySound(soundForbidden);
             return;
         }
         
@@ -302,7 +306,7 @@ void BuildingSellBlock(Tile* tile, int blockIndex)
 
     if (tile->building.blockCount <= blockIndex)
     {
-        EmitSound(SoundWrong);
+        PlaySound(soundForbidden);
         return;
     }
 

@@ -6,9 +6,6 @@
 #include "enemy.h"
 #include "raymath.h"
 
-static int screenWidth;     //passed from game.c
-static int screenHeight;    //passed from game.c
-
 static Texture cursorTexture;
 static Texture cursorStraightTexture;
 
@@ -153,11 +150,8 @@ Vector2 GetScaledMousePosition() {
     return Vector2Scale(GetMousePosition(), mouseScale);
 }
 
-void UiInit(int aScreenWidth, int aScreenHeight)
+void UiInit()
 {
-    screenWidth = aScreenWidth;
-    screenHeight = aScreenHeight;
-
     //textures
     cursorTexture = LoadTexture("resources/cursor.png");
     cursorStraightTexture = LoadTexture("resources/cursor_straight.png");
@@ -390,7 +384,7 @@ void UiUpdate()
         hideUI = !hideUI;
     }
 
-    //if (IsThunderboltUnlocked())
+    if (IsThunderboltUnlocked())
     {
         thunderboltButtonSettings.isEnabled = true;
     }
@@ -506,7 +500,11 @@ void UiUpdate()
         hoveredButton = 0;
     }
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) selectedTwoStepButton = 0;
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+    {
+        PlaySound(soundForbidden);
+        selectedTwoStepButton = 0;
+    }
 
     if (selectedTwoStepButton == &sellButton)
     {
