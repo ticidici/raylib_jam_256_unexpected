@@ -3,6 +3,7 @@
 #include "raymath.h"
 #include "terrain.h"
 #include "enemy.h"
+#include "sound.h"
 
 #define BULLET_COUNT 256
 
@@ -37,7 +38,7 @@ void BulletUpdate()
             {
                 // Collision
                 Tile *tile = TerrainGetTile(bullet->targetX, bullet->targetY);
-
+                PlaySound(soundImpact);
                 if (tile && tile->enemy && tile->enemy->alive)
                 {
                     Enemy *enemy = tile->enemy;
@@ -46,6 +47,7 @@ void BulletUpdate()
                     {
                         enemy->alive = false;
                         tile->enemy = 0;
+                        PlaySound(soundEnemyDeath);
                     }
                 }
 
@@ -69,6 +71,7 @@ void BulletRender()
 
 void BulletSpawn(Vector3 position, Enemy *target, WeaponType type)
 {
+    PlaySound(soundShot);
     for (int i = 0; i < BULLET_COUNT; i++)
     {
         Bullet *bullet = &bullets[i];

@@ -10,6 +10,9 @@ enum SoundType
 
 
 extern Sound waveSound;
+extern Sound soundImpact;
+extern Sound soundEnemyDeath;
+extern Sound soundShot;
 
 void SoundInit();
 
