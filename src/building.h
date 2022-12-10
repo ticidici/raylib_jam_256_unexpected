@@ -39,6 +39,14 @@ struct Building
     bool isPorquet;
 } typedef Building;
 
+extern int weaponWeakPrice;
+extern int weaponStrongPrice;
+extern int weaponStrongIronNeeded;
+
+extern int cubeStrawWheatNeeded;
+extern int cubeStickWoodNeeded;
+extern int cubeBrickClayNeeded;
+
 void BuildingInit();
 
 void BuildingUpdate(Building *building, Vector3 position);

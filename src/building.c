@@ -23,13 +23,13 @@ static Model weaponStrong;
 static Color weaponWeakColor = {240, 223, 194, 255};
 static Color weaponStrongColor = {169, 232, 227, 255};
 
-static int weaponWeakPrice = 5;
-static int weaponStrongPrice = 15;
-static int weaponStrongIronNeeded = 3;
+int weaponWeakPrice = 5;
+int weaponStrongPrice = 15;
+int weaponStrongIronNeeded = 3;
 
-static int cubeStrawWheatNeeded = 10;
-static int cubeStickWoodNeeded = 10;
-static int cubeBrickClayNeeded = 10;
+int cubeStrawWheatNeeded = 10;
+int cubeStickWoodNeeded = 10;
+int cubeBrickClayNeeded = 10;
 
 static int sellPriceWeakWeapon = 2;
 static int sellPriceStrongWeapon = 7;
@@ -218,7 +218,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         tile->building.blocks[index].weaponType = WEAPON_NONE;
         tile->building.blocks[index].hp = brickBlockHp;
         tile->building.blockCount++;
-        PlaySound(soundBuild);
+         PlaySound(soundBuild);
     }
 
 }

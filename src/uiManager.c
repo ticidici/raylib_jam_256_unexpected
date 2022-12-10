@@ -983,6 +983,25 @@ void UiRender()
     }
     //----------- /buttons right side -----------
 
+
+    const char* priceText = 0;
+
+    if (hoveredButton == &weaponBlock3Button || hoveredButton == &weaponBlock2Button || hoveredButton == &weaponBlock1Button) {
+        if (WhichWeaponIsSelected() == WeaponStrong) {
+            priceText = TextFormat("-%d gold -%d iron", weaponStrongPrice, weaponStrongIronNeeded);
+        }
+        else if (WhichWeaponIsSelected() == WeaponWeak) {
+            priceText = TextFormat("-%d gold", weaponWeakPrice);
+        }
+    }
+    else if (hoveredButton == &grassButton) {
+        //priceText = TextFormat("-%d gold", grass);
+    }
+
+    if (priceText) {
+        DrawText(priceText, thunderboltButton.x + thunderboltButton.width + 6, thunderboltButton.y, 16, RAYWHITE);
+    }
+
     // Timer
     int timeInSeconds = floorf(GetRunTime());
     int seconds = timeInSeconds % 60;
