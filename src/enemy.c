@@ -109,7 +109,7 @@ void EnemyUpdateOne(Enemy *enemy)
             {
                 enemy->lastAttackTime = now;
                 enemy->lastMoveTime = now;
-                BuildingDestroyBlock(&target->building, 0);
+                BuildingDamageBlock(&target->building, 0, enemy->damage);
             }
         }
         else
@@ -144,6 +144,24 @@ void EnemyUpdateOne(Enemy *enemy)
             }
         }
     }
+}
+
+/// <summary>
+/// </summary>
+/// <param name="tile"></param>
+/// <param name="enemy"></param>
+/// <param name="damage"></param>
+/// <returns>true if DEAD</returns>
+bool DamageEnemy(Tile* tile, Enemy* enemy, int damage)
+{
+    enemy->hp -= damage;
+    if (enemy->hp <= 0)
+    {
+        enemy->alive = false;
+        tile->enemy = 0;
+        return true;
+    }
+    return false;
 }
 
 Enemy *FindClosestEnemy(Vector3 position, float maxDistance)
@@ -184,6 +202,7 @@ void EnemySpawn(int tileX, int tileY)
             enemy.y = tileY;
             enemy.position = tile->position;
             enemy.hp = 4;
+            enemy.damage = 5;
             enemy.alive = true;
             enemy.model = wolf;
             enemies[i] = enemy;

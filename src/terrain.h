@@ -57,8 +57,10 @@ void TerrainBuyTile(TileType tileType, Tile *tile);
 bool ShouldShowTileInfo();
 
 void EnemySteppedOnLava(Enemy* enemy, Tile* tile);
+bool IsThunderboltReady();
 
 // Private
+void PerformThunderbolt();
 void DrawGridCentered(float tileSpacing, int tileCount);
 void UpdateTileSelector();
 void CalculateTileEffects();

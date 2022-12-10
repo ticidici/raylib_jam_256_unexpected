@@ -30,8 +30,6 @@ int GetResource(TileType tileType);
 float GetRunTime();
 void ModifyMoney(int value);
 void ModifyResource(TileType tileType, int value);
-bool IsThunderboltReady();
-Vector2 GetThunderboltDamage();
 bool IsThunderboltUnlocked();
 bool IsLavaUnlocked();
 

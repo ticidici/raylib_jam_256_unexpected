@@ -35,6 +35,8 @@ Enemy *FindClosestEnemy(Vector3 position, float maxDistance);
 
 void EnemySpawn(int tileX, int tileY);
 
+bool DamageEnemy(Tile* tile, Enemy* enemy, int damage);
+
 // Private
 void EnemyUpdateOne(Enemy *enemy);
 

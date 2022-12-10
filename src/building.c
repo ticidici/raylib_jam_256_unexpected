@@ -44,6 +44,11 @@ static int extraPorquetSellBonusWheat = 5;
 static int extraPorquetSellBonusWood = 5;
 static int extraPorquetSellBonusClay = 10;
 
+static int porquetBlocksHp = 50;
+static int strawBlockHp = 10;
+static int stickBlockHp = 20;
+static int brickBlockHp = 30;
+
 void BuildingInit()
 {
     pig = LoadModel("resources/pig.glb");
@@ -133,10 +138,17 @@ void BuildingRender(Building *building, Vector3 position)
     }
 }
 
+void BuildingDamageBlock(Building* building, int blockIndex, int damage)
+{
+    if (blockIndex - 1 > building->blockCount) return;
+
+    building->blocks[blockIndex].hp -= damage;
+    if (building->blocks[blockIndex].hp <= 0) BuildingDestroyBlock(building, blockIndex);
+}
+
 void BuildingDestroyBlock(Building *building, int blockIndex)
 {
-    if (blockIndex - 1 > building->blockCount)
-        return;
+    if (blockIndex - 1 > building->blockCount) return;
 
     building->blocks[blockIndex].weaponType = WEAPON_NONE;
 
@@ -171,6 +183,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         int index = tile->building.blockCount;
         tile->building.blocks[index].buildingMaterial = materialType;
         tile->building.blocks[index].weaponType = WEAPON_NONE;
+        tile->building.blocks[index].hp = strawBlockHp;
         tile->building.blockCount++;
     }
     else if (materialType == Stick)
@@ -185,6 +198,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         int index = tile->building.blockCount;
         tile->building.blocks[index].buildingMaterial = materialType;
         tile->building.blocks[index].weaponType = WEAPON_NONE;
+        tile->building.blocks[index].hp = stickBlockHp;
         tile->building.blockCount++;
     }
     else if (materialType == Brick)
@@ -199,6 +213,7 @@ void BuildingBuyCube(BuildingMaterial materialType, Tile* tile)
         int index = tile->building.blockCount;
         tile->building.blocks[index].buildingMaterial = materialType;
         tile->building.blocks[index].weaponType = WEAPON_NONE;
+        tile->building.blocks[index].hp = brickBlockHp;
         tile->building.blockCount++;
     }
 
@@ -314,4 +329,9 @@ void BuildingRelease()
 
     UnloadModel(weaponWeak);
     UnloadModel(weaponStrong);
+}
+
+int GetPorquetBlocksHp()
+{
+    return porquetBlocksHp;
 }

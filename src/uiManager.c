@@ -142,8 +142,6 @@ static RectangleSettings exchangeRate_Iron_Clay_ButtonSettings;
 static Rectangle* hoveredButton;
 static Rectangle* selectedTwoStepButton;
 
-bool isSellMode = false;
-
 bool hideUI = false;
 
 void UiInit(int aScreenWidth, int aScreenHeight)
@@ -477,7 +475,10 @@ void UiUpdate()
     else if (thunderboltButtonSettings.isEnabled && CheckCollisionPointRec(mousePosition, thunderboltButton))
     {
         hoveredButton = &thunderboltButton;
-        if (isMouseLeftPressed) selectedTwoStepButton = &thunderboltButton;
+        if (isMouseLeftPressed && IsThunderboltReady())
+        {
+            selectedTwoStepButton = &thunderboltButton;
+        }
     }
 
     //unhover if no hover
@@ -487,6 +488,8 @@ void UiUpdate()
 
         hoveredButton = 0;
     }
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) selectedTwoStepButton = 0;
 
     if (selectedTwoStepButton == &sellButton)
     {
@@ -993,9 +996,9 @@ void UiRender()
     //DrawFPS(232, 0);
 
     // Cursor
-    if (isSellMode)
+    if (selectedTwoStepButton == &thunderboltButton)
     {
-        DrawTexture(sellCubeIcon, GetMouseX() - 10, GetMouseY(), WHITE);
+        DrawTexture(thunderboltIcon, GetMouseX() -10, GetMouseY() -8, WHITE);
     }
     else
     {
@@ -1112,6 +1115,14 @@ WeaponType WhichWeaponIsSelected()
     }
 
     return WEAPON_NONE;
+}
+
+void UiStopThunderbolt()
+{
+    if (selectedTwoStepButton == &thunderboltButton)
+    {
+        selectedTwoStepButton = 0;
+    }
 }
 
 
@@ -1247,6 +1258,11 @@ bool UiIsThunderboltPressed()
     if (thunderboltButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
     return CheckCollisionPointRec(GetMousePosition(), thunderboltButton);
+}
+
+bool UiIsThunderboltCursor()
+{
+    return selectedTwoStepButton == &thunderboltButton;
 }
 
 //Private

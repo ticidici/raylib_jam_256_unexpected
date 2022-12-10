@@ -41,12 +41,7 @@ void BulletUpdate()
                 if (tile && tile->enemy && tile->enemy->alive)
                 {
                     Enemy *enemy = tile->enemy;
-                    enemy->hp -= bullet->damage;
-                    if (enemy->hp <= 0)
-                    {
-                        enemy->alive = false;
-                        tile->enemy = 0;
-                    }
+                    DamageEnemy(tile, enemy, bullet->damage);
                 }
 
                 bullet->alive = false;
