@@ -16,8 +16,8 @@ static float wood = 10;
 static float clay = 10;
 static float iron = 0;
 
-static float lavaUnlockTime = 5;//300
-static float thunderboltUnlockTime = 10;//420
+static float lavaUnlockTime = 120;//300
+static float thunderboltUnlockTime = 180;//420
 //static float fastEnemyUnlockTime = 180;//180
 //static float strongEnemyUnlockTime = 400;//400
 //
