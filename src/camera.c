@@ -3,7 +3,7 @@
 static const int screenWidth = 256;
 static const int screenHeight = 256;
 
-static unsigned int screenScale = 3;
+static unsigned int screenScale = 2;
 static unsigned int prevScreenScale = 1;
 
 static Camera camera = { 0 };

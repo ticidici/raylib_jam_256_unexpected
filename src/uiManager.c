@@ -144,6 +144,14 @@ static Rectangle* selectedTwoStepButton;
 
 bool hideUI = false;
 
+Vector2 GetScaledMousePosition() {
+    float mouseScale = 1;
+#if defined(PLATFORM_WEB)
+    mouseScale = 1.0f / GetCurrentScreenScale(); // mm, yeah
+#endif
+    return Vector2Scale(GetMousePosition(), mouseScale);
+}
+
 void UiInit(int aScreenWidth, int aScreenHeight)
 {
     screenWidth = aScreenWidth;
@@ -378,7 +386,7 @@ void UiUpdate()
         thunderboltButtonSettings.isEnabled = true;
     }
 
-    Vector2 mousePosition = GetMousePosition();
+    Vector2 mousePosition = GetScaledMousePosition();
     bool isMouseLeftPressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
     //check hovered
     //tiles
@@ -988,8 +996,17 @@ void UiRender()
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
         DrawText("GAME PAUSED", 66, 98, 18, MAROON);
     }
+    // Title screen
     if (state == Start) {
         DrawTexture(startScreenTexture, 0, 0, WHITE);
+    }
+    // GameOver screen
+    if (state == GameOver)
+    {
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
+        DrawText("GAME OVER", 76, 80, 18, MAROON);
+        DrawText(TextFormat("SURVIVED %02i:%02i", minutes, seconds), 72, 110, 14, MAROON);
+        DrawText("CLICK TO GO TO TITLE SCREEN", 46, 180, 8, MAROON);
     }
 
     // FPS
@@ -1132,14 +1149,14 @@ bool UiIsWeaponWeakButtonPressed()
 {
     if (weaponWeakButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), weaponWeakButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), weaponWeakButton);
 }
 
 bool UiIsWeaponStrongButtonPressed()
 {
     if (weaponStrongButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), weaponStrongButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), weaponStrongButton);
 }
 
 //  weapon floor
@@ -1147,21 +1164,21 @@ bool UiIsWeaponFloor1ButtonPressed()
 {
     if (weaponBlock1ButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), weaponBlock1Button);
+    return CheckCollisionPointRec(GetScaledMousePosition(), weaponBlock1Button);
 }
 
 bool UiIsWeaponFloor2ButtonPressed()
 {
     if (weaponBlock2ButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), weaponBlock2Button);
+    return CheckCollisionPointRec(GetScaledMousePosition(), weaponBlock2Button);
 }
 
 bool UiIsWeaponFloor3ButtonPressed()
 {
     if (weaponBlock3ButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), weaponBlock3Button);
+    return CheckCollisionPointRec(GetScaledMousePosition(), weaponBlock3Button);
 }
 
 //cubes
@@ -1169,21 +1186,21 @@ bool UiIsCubeStrawButtonPressed()
 {
     if (cubeStrawButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), cubeStrawButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), cubeStrawButton);
 }
 
 bool UiIsCubeStickButtonPressed()
 {
     if (cubeStickButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), cubeStickButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), cubeStickButton);
 }
 
 bool UiIsCubeBrickButtonPressed()
 {
     if (cubeBrickButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), cubeBrickButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), cubeBrickButton);
 }
 
 //tiles
@@ -1191,35 +1208,35 @@ bool UiIsTileGrassButtonPressed()
 {
     if (grassButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), grassButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), grassButton);
 }
 
 bool UiIsTileWheatButtonPressed()
 {
     if (wheatButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), wheatButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), wheatButton);
 }
 
 bool UiIsTileWoodButtonPressed()
 {
     if (woodButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), woodButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), woodButton);
 }
 
 bool UiIsTileClayButtonPressed()
 {
     if (clayButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), clayButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), clayButton);
 }
 
 bool UiIsTileLavaButtonPressed()
 {
     if (lavaButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), lavaButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), lavaButton);
 }
 
 //selling
@@ -1227,7 +1244,7 @@ bool UiIsSellButtonPressed()
 {
     if (sellButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), sellButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), sellButton);
 }
 
 //  floor for selling
@@ -1235,21 +1252,21 @@ bool UiIsSellFloor1Pressed()
 {
     if (sellBlock1ButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), sellBlock1Button);
+    return CheckCollisionPointRec(GetScaledMousePosition(), sellBlock1Button);
 }
 
 bool UiIsSellFloor2Pressed()
 {
     if (sellBlock2ButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), sellBlock2Button);
+    return CheckCollisionPointRec(GetScaledMousePosition(), sellBlock2Button);
 }
 
 bool UiIsSellFloor3Pressed()
 {
     if (sellBlock3ButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), sellBlock3Button);
+    return CheckCollisionPointRec(GetScaledMousePosition(), sellBlock3Button);
 }
 
 //thunderbolt
@@ -1257,7 +1274,7 @@ bool UiIsThunderboltPressed()
 {
     if (thunderboltButtonSettings.isEnabled == false) return false;
     if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    return CheckCollisionPointRec(GetMousePosition(), thunderboltButton);
+    return CheckCollisionPointRec(GetScaledMousePosition(), thunderboltButton);
 }
 
 bool UiIsThunderboltCursor()

@@ -8,7 +8,12 @@
 bool IsPointInsideQuadInScreenSpace(Vector2 point, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3)
 {
     Camera camera = GetCamera();
+
     unsigned int screenScale = GetCurrentScreenScale();
+
+#if defined(PLATFORM_WEB)
+    screenScale = 1; // mm, yeah
+#endif
 
     //by screen pos
     Vector2 vertex0Screen = GetWorldToScreen(v0, camera);
