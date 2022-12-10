@@ -27,7 +27,6 @@ void Init()
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
-    SoundInit();
     GameStateInit();
 
     CameraInit();

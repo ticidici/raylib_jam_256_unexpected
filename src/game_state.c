@@ -59,6 +59,7 @@ void GameStateUpdate()
 
 	if (state == Start && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 		state = Running;
+		SoundInit();
 	}
 
 	if (state == GameOver && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -72,9 +73,8 @@ void GameStateUpdate()
 
 	if (runTimePassed - wave.startTime >= wave.duration)
 	{
-		if (wave.number > 0) {
-			// PlaySoundMulti(waveSound);
-		}
+		
+		PlaySoundMulti(waveSound);
 
 		// Next wave
 		wave.duration = 20;

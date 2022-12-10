@@ -3,15 +3,19 @@
 
 Sound waveSound;
 
+static bool init = false;
+
 void SoundInit() {
-	//InitAudioDevice();
-	//waveSound = LoadSound("resources/wave.mp3");
+	if (init) return;
+	init = true;
+	InitAudioDevice();
+	waveSound = LoadSound("resources/wave.mp3");
 }
 
 void SoundRelease() {
-	//StopSoundMulti();
-	//UnloadSound(waveSound);
-	//CloseAudioDevice();
+	StopSoundMulti();
+	UnloadSound(waveSound);
+	CloseAudioDevice();
 }
 
 void EmitSound(SoundType soundType)
