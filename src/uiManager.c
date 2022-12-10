@@ -743,6 +743,23 @@ void UiRender()
             DrawText(enemyText, 4, 240, 12, RAYWHITE);//enemy name or "no enemy"
         }
         // -------------- /Tile Info ----------------------
+        //tunderbolt
+        //if (IsThunderboltUnlocked())
+        {
+            DrawRectangle(thunderboltContainerSettings.topLeftCorner.x,
+            thunderboltContainerSettings.topLeftCorner.y,
+            thunderboltContainerSettings.width,
+            thunderboltContainerSettings.height,
+            Fade(thunderboltContainerSettings.color, 0.8f));
+
+            Color thunderboltIconColor = WHITE;
+            if (!IsThunderboltReady()) thunderboltIconColor = GRAY;
+            if (hoveredButton == &thunderboltButton || selectedTwoStepButton == &thunderboltButton)
+            {
+                DrawRectangle(thunderboltButtonSettings.topLeftCorner.x, thunderboltButtonSettings.topLeftCorner.y, thunderboltButtonSettings.width, thunderboltButtonSettings.height, thunderboltButtonSettings.color);
+            }
+            DrawTexture(thunderboltIcon, thunderboltButtonSettings.topLeftCorner.x + 2, thunderboltButtonSettings.topLeftCorner.y + 2, thunderboltIconColor);
+        }
     }
 
     //----------- buttons right side -----------
@@ -781,24 +798,6 @@ void UiRender()
             sellCubeFloorContainerSettings.width,
             sellCubeFloorContainerSettings.height,
             Fade(sellCubeFloorContainerSettings.color, 0.8f));
-    }
-
-    //tunderbolt
-    //if (IsThunderboltUnlocked())
-    {
-        DrawRectangle(thunderboltContainerSettings.topLeftCorner.x,
-            thunderboltContainerSettings.topLeftCorner.y,
-            thunderboltContainerSettings.width,
-            thunderboltContainerSettings.height,
-            Fade(thunderboltContainerSettings.color, 0.8f));
-
-        Color thunderboltIconColor = WHITE;
-        if (!IsThunderboltReady()) thunderboltIconColor = GRAY;
-        if (hoveredButton == &thunderboltButton || selectedTwoStepButton == &thunderboltButton)
-        {
-            DrawRectangle(thunderboltButtonSettings.topLeftCorner.x, thunderboltButtonSettings.topLeftCorner.y, thunderboltButtonSettings.width, thunderboltButtonSettings.height, thunderboltButtonSettings.color);
-        }
-        DrawTexture(thunderboltIcon, thunderboltButtonSettings.topLeftCorner.x + 2, thunderboltButtonSettings.topLeftCorner.y + 2, thunderboltIconColor);
     }
 
     //buy weapons
