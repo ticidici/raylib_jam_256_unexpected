@@ -14,9 +14,17 @@ struct EnemyWave
 
 } typedef EnemyWave;
 
+enum GameState {
+    Start,
+    Running,
+    Paused
+} typedef GameState;
+
+extern GameState state;
+
 void GameStateInit();
 void GameStateUpdate();
-bool IsPaused();
+
 int GetMoney();
 int GetResource(TileType tileType);
 float GetRunTime();

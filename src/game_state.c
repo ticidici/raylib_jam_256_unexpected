@@ -3,8 +3,6 @@
 #include "terrain.h"
 #include "sound.h"
 
-static bool isPaused = false;
-
 //session stats
 static float runsFinished = 0;
 
@@ -32,10 +30,12 @@ static float bossSpawnTime = 900;
 
 static EnemyWave wave;
 
+GameState state;
+
 
 void GameStateInit()
 {
-	isPaused = false;
+	state = Start;
 
 	runTimePassed = 0;
 	money = 11;
@@ -55,11 +55,15 @@ void GameStateInit()
 
 void GameStateUpdate()
 {
-	if(!isPaused) runTimePassed += GetFrameTime();
+	if(state == Running) runTimePassed += GetFrameTime();
+
+	if (state == Start && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		state = Running;
+	}
 
 	if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_P))
 	{
-		isPaused = !isPaused;
+		state = state == Running ? Paused : Running;
 	}
 
 	if (runTimePassed - wave.startTime >= wave.duration)
@@ -102,11 +106,6 @@ void GameStateUpdate()
 			}
 		}
 	}
-}
-
-bool IsPaused()
-{
-	return isPaused;
 }
 
 int GetMoney()

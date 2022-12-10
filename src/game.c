@@ -82,7 +82,7 @@ void Update()
     //----------------------------------------------------------------------------------
     GameStateUpdate();
 
-    if (!IsPaused())
+    if (state == Running)
     {
         CameraUpdate();
         TerrainUpdate();

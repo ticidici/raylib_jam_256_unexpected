@@ -31,6 +31,7 @@ static Texture cubeBrickIcon;
 static Texture weaponWeakIcon;
 static Texture weaponStrongIcon;
 
+static Texture startScreenTexture;
 
 static Texture sellCubeIcon;
 static Texture thunderboltIcon;//also changes the cursor 
@@ -176,6 +177,8 @@ void UiInit(int aScreenWidth, int aScreenHeight)
 
     sellCubeIcon = LoadTexture("resources/sell.png");
     thunderboltIcon = LoadTexture("resources/thunderbolt.png");
+
+    startScreenTexture = LoadTexture("resources/start_screen.png");
 
     //BUTTON SETTINGS
     //right side container
@@ -362,9 +365,8 @@ void UiInit(int aScreenWidth, int aScreenHeight)
 
 void UiUpdate()
 {
-    bool isPaused = IsPaused();
 
-    if (isPaused) return;
+    if (state != Running) return;
 
 	//things like size and positioning or movement of ui
     //Toggle UI
@@ -519,7 +521,7 @@ void UiUpdate()
 
 void UiRender()
 {
-    bool isPaused = IsPaused();
+   
     //DrawText(TextFormat("(%04f,%04f)", mousePosition.x, mousePosition.y), 0, 0, 20, RED);
     //DrawCircleLines(GetMouseX(), GetMouseY(), 5.0f, MAROON);
     //DrawTexture(cursorTexture, GetMouseX() - 6, GetMouseY() - 2, WHITE);
@@ -978,10 +980,13 @@ void UiRender()
 
 
     // Pause overlay
-    if (isPaused)
+    if (state == Paused)
     {
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.5f));
         DrawText("GAME PAUSED", 66, 98, 18, MAROON);
+    }
+    if (state == Start) {
+        DrawTexture(startScreenTexture, 0, 0, WHITE);
     }
 
     // FPS
@@ -1091,6 +1096,8 @@ void UiRelease()
 
     UnloadTexture(sellCubeIcon); 
     UnloadTexture(thunderboltIcon);
+
+    UnloadTexture(startScreenTexture);
 }
 
 WeaponType WhichWeaponIsSelected()
