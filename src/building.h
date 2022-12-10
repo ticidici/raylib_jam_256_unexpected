@@ -30,6 +30,8 @@ struct Block
     WeaponType weaponType;
     double lastAttackTime;
     float destroyOffset;
+    float rotationTarget;
+    float rotation;
 } typedef Block;
 
 struct Building

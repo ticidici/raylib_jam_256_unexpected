@@ -9,6 +9,7 @@
 #define BLOCK_HEIGHT 2.0f
 #define BLOCK_FALL_SPEED 6.0f
 #define BLOCK_ATTACK_COLDOWN 1.0f
+#define BLOCK_ROTATION_SPEED 720.0f
 
 static Model pig;
 static float pigScale = 0.020f;
@@ -87,8 +88,33 @@ void BuildingUpdate(Building *building, Vector3 position)
             {
                 block->lastAttackTime = now;
                 BulletSpawn(blockPosition, targetEnemy, block->weaponType);
+                Vector2 pos = { position.x, position.z };
+                Vector2 targetPos = { targetEnemy->position.x,  targetEnemy->position.z};
+                Vector2 dir = Vector2Normalize(Vector2Subtract(targetPos, pos));
+                float angle = atan2f(-dir.y, dir.x);
+                block->rotationTarget = angle * RAD2DEG + 90;
+            }
+            else {
+                block->rotationTarget = 0;
             }
         }
+
+        // Rotate towards target
+        float rotationDiff = block->rotationTarget - block->rotation;
+        rotationDiff += (rotationDiff > 180) ? -360
+            : (rotationDiff < -180) ? 360
+            : 0;
+        float rotationIncrement = BLOCK_ROTATION_SPEED * delta;
+        if (fabs(rotationDiff) > rotationIncrement)
+        {
+            int sign = rotationDiff > 0 ? 1 : -1;
+            block->rotation += rotationIncrement * sign;
+        }
+        else
+        {
+            block->rotation = block->rotationTarget;
+        }
+
     }
 }
 
@@ -102,27 +128,29 @@ void BuildingRender(Building *building, Vector3 position)
         float y = position.y + i * BLOCK_HEIGHT + block->destroyOffset;
         Vector3 blockPosition = {position.x, y, position.z};
 
+        float angle = block->rotation;
         if (block->buildingMaterial == Straw)
         {
-            DrawModel(strawCube, blockPosition, 1.f, WHITE);
+            DrawModelEx(strawCube, blockPosition, (Vector3) { 0, 1, 0 }, angle, (Vector3) { 1, 1, 1 }, WHITE);
         }
         else if (block->buildingMaterial == Stick)
         {
-            DrawModel(stickCube, blockPosition, 1.f, WHITE);
+            DrawModelEx(stickCube, blockPosition, (Vector3) { 0, 1, 0 }, angle, (Vector3) { 1, 1, 1 }, WHITE);
         }
         else if (block->buildingMaterial == Brick)
         {
-            DrawModel(brickCube, blockPosition, 1.f, WHITE);
+            DrawModelEx(brickCube, blockPosition, (Vector3) { 0, 1, 0 }, angle, (Vector3) { 1, 1, 1 }, WHITE);
         }
 
         if (block->weaponType == WeaponWeak)
         {
-            DrawModel(weaponWeak, blockPosition, 1.f, weaponWeakColor);
+            DrawModelEx(weaponWeak, blockPosition, (Vector3) { 0, 1, 0 }, angle, (Vector3) { 1, 1, 1 }, weaponWeakColor);
         }
         else if (block->weaponType == WeaponStrong)
         {
-            DrawModel(weaponStrong, blockPosition, 1.f, weaponStrongColor);
+            DrawModelEx(weaponStrong, blockPosition, (Vector3) { 0, 1, 0 }, angle, (Vector3) { 1, 1, 1 }, weaponStrongColor);
         }
+
 
     }
 
