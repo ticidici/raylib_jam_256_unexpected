@@ -17,12 +17,12 @@ static float clay = 10;
 static float iron = 0;
 
 static float lavaUnlockTime = 120;//300
-static float thunderboltUnlockTime = 180;//420
-//static float fastEnemyUnlockTime = 180;//180
-//static float strongEnemyUnlockTime = 400;//400
-//
-//static bool bossSpawned = false;
-//static float bossSpawnTime = 900;
+static float thunderboltUnlockTime = 20;//420
+static float fastEnemyUnlockTime = 180;//180
+static float strongEnemyUnlockTime = 400;//400
+
+static bool bossSpawned = false;
+static float bossSpawnTime = 900;
 
 static EnemyWave wave;
 
@@ -40,7 +40,7 @@ void GameStateInit()
 	clay = 10;
 	iron = 0;
 
-	//bossSpawned = false;
+	bossSpawned = false;
 
 	wave.startTime = 0;
 	wave.duration = 3;
@@ -192,30 +192,30 @@ bool IsLavaUnlocked()
 
 bool IsFastEnemyUnlocked()
 {
-	//if (runTimePassed >= fastEnemyUnlockTime)
-	//	return true;
+	if (runTimePassed >= fastEnemyUnlockTime)
+		return true;
 	return false;
 }
 
 bool IsStrongEnemyUnlocked()
 {
-	//if (runTimePassed >= strongEnemyUnlockTime)
-	//	return true;
+	if (runTimePassed >= strongEnemyUnlockTime)
+		return true;
 	return false;
 }
 
 bool ShouldSpawnBoss()
 {
-	//if (bossSpawned)
-	//	return false;
-	//
-	//if (runTimePassed >= bossSpawnTime)
-	//	return true;
+	if (bossSpawned)
+		return false;
+	
+	if (runTimePassed >= bossSpawnTime)
+		return true;
 
 	return false;
 }
 
 void SetBossSpawned()
 {
-	//bossSpawned = true;
+	bossSpawned = true;
 }
