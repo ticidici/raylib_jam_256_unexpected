@@ -168,7 +168,8 @@ void BuildingRender(Building *building, Vector3 position)
 
 void BuildingDamageBlock(Building* building, int blockIndex, int damage)
 {
-    if (blockIndex - 1 > building->blockCount) return;
+
+    if (!building || building->blockCount <= 0 || blockIndex - 1 > building->blockCount) return;
 
     building->blocks[blockIndex].hp -= damage;
     if (building->blocks[blockIndex].hp <= 0)
