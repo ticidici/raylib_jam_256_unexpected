@@ -169,7 +169,7 @@ void BuildingRender(Building *building, Vector3 position)
 void BuildingDamageBlock(Building* building, int blockIndex, int damage)
 {
 
-    if (!building || building->blockCount <= 0 || blockIndex - 1 > building->blockCount) return;
+    if (!building || building->blockCount <= 0 || blockIndex - 1 > building->blockCount || blockIndex < 0) return;
 
     building->blocks[blockIndex].hp -= damage;
     if (building->blocks[blockIndex].hp <= 0)
@@ -180,15 +180,36 @@ void BuildingDamageBlock(Building* building, int blockIndex, int damage)
 
 void BuildingDestroyBlock(Building *building, int blockIndex)
 {
-    if (blockIndex - 1 > building->blockCount) return;
+    if (!building || building->blockCount <= 0 || blockIndex - 1 > building->blockCount || blockIndex < 0) return;
 
+    //reset just in case
     building->blocks[blockIndex].weaponType = WEAPON_NONE;
+    building->blocks[blockIndex].hp = strawBlockHp;
+    building->blocks[blockIndex].buildingMaterial = Straw;
 
-    for (int i = blockIndex + 1; i < building->blockCount; i++)
+    if (building->blockCount > 1)
     {
-        building->blocks[i - 1] = building->blocks[i];
-        building->blocks[i - 1].destroyOffset = BLOCK_HEIGHT;
+        if (blockIndex == 0)
+        {
+            building->blocks[0] = building->blocks[1];
+            building->blocks[0].destroyOffset = BLOCK_HEIGHT;
+        }
+        if (building->blockCount > 2)
+        {
+            if (blockIndex == 0 || blockIndex == 1)
+            {
+                building->blocks[1] = building->blocks[1];
+                building->blocks[1].destroyOffset = BLOCK_HEIGHT;
+            }
+        }
     }
+
+    //this made the game explode for some reason
+    //for (int i = blockIndex + 1; i < building->blockCount; i++)
+    //{
+    //    building->blocks[i - 1] = building->blocks[i];
+    //    building->blocks[i - 1].destroyOffset = BLOCK_HEIGHT;
+    //}
 
     building->blockCount -= 1;
     PlaySound(soundBreak);

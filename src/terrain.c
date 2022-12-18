@@ -192,11 +192,6 @@ void TerrainInit()
     buildingPorquet->blocks[2].buildingMaterial = Brick;
     buildingPorquet->blocks[2].hp = GetPorquetBlocksHp();
     buildingPorquet->blockCount = 3;
-
-    Building* buildingTest = &battlefieldTiles[9][9].building;
-    buildingTest->blocks[0].buildingMaterial = Brick;
-    buildingTest->blocks[0].hp = 999;
-    buildingTest->blockCount = 1;
 }
 
 void TerrainRelease()
