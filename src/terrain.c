@@ -643,25 +643,27 @@ void CalculateTileEffects()
                 }
             }
 
+            if (candidateTile->tileType == GrassType) continue;
+
             if (yieldWheat && candidateTile->tileType == WheatType)
             {
                 ModifyResource(WheatType, 1);
                 if (IsWholeSet(candidateTile)) ModifyResource(WheatType, wholeSetBonusResourceYield);
             }
 
-            if (yieldWood && candidateTile->tileType == WoodType)
+            else if (yieldWood && candidateTile->tileType == WoodType)
             {
                 ModifyResource(WoodType, 1);
                 if (IsWholeSet(candidateTile)) ModifyResource(WoodType, wholeSetBonusResourceYield);
             }
         
-            if (yieldClay && candidateTile->tileType == ClayType)
+            else if (yieldClay && candidateTile->tileType == ClayType)
             {
                 ModifyResource(ClayType, 1);
                 if (IsWholeSet(candidateTile)) ModifyResource(ClayType, wholeSetBonusResourceYield);
             }
         
-            if (candidateTile->tileType == LavaType)
+            else if (candidateTile->tileType == LavaType)
             {
                 if (yieldIron)
                 {
