@@ -1,11 +1,13 @@
-## $(Game Title)
+## Defence of Momentum
 
 ![$(Game Title)](screenshots/screenshot000.png "$(Game Title)")
 
 ### Description
 Play at https://ticidici.github.io/raylib_jam_256_unexpected/
 
-$(Your Game Description)
+Even after his brothers death, the piggie survived the attack of the wolf, but now he comes back with his pack in search of revenge.
+
+Build your fortress and prepare for the waves of wolves incoming. Buy different tiles with money to yield resources, build blocks with resources to stop the wolves and buy weapons to destroy them.
 
 ### Features
 
@@ -15,10 +17,24 @@ $(Your Game Description)
 
 ### Controls
 
-Keyboard:
- - $(Game Control 01)
- - $(Game Control 02)
- - $(Game Control 03)
+Keyboard and Mouse:
+ - Left Mouse Button: confirm
+
+ - Right Mouse Button: cancel
+
+ - Middle Mouse Button: pan camera in isometric perspective
+
+ - C: toggle perspective (top-down, isometric)
+
+ - Q/E: rotate camera in isometric perspective
+
+ - F: toggle zoom (close/far)
+
+ - I: toggle info
+
+ - U: toggle UI
+
+ - G: Toggle grid
 
 ### Screenshots
 
