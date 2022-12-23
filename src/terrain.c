@@ -411,6 +411,7 @@ void TerrainRender()
         for (int j = 0; j < BATTLEFIELD_SIZE; j++)
         {
             Tile *tile = &battlefieldTiles[i][j];
+            if (tile == 0) continue;
             BuildingRender(&tile->building, tile->position);
             Color color = WHITE;
             if (tile->tileType == LavaType && tile->lavaAboutToExtend) color = lavaAboutToExtendColor;
@@ -427,7 +428,7 @@ void TerrainRender()
                     }
                 }
             }
-            DrawModel(battlefieldTiles[i][j].tileModel, battlefieldTiles[i][j].position, 1.f, color);
+            DrawModel(tile->tileModel, tile->position, 1.f, color);
         }
     }
 
@@ -530,8 +531,10 @@ void TerrainBuyTile(TileType tileType, Tile *tile)
             }
             ModifyMoney(-grassPrice);
 
-            if(GetRandomValue(0, 100) < 50) tile->tileModel = grassTile;
-            else tile->tileModel = grassAltTile;
+            tile->tileModel = grassAltTile;
+
+            //if(GetRandomValue(0, 100) < 50) tile->tileModel = grassTile;
+            //else tile->tileModel = grassAltTile;
             break;
 
         case LavaType:
